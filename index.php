@@ -1,75 +1,75 @@
 <?php
-//include 'elems/init.php';
+include 'elems/init.php';
 
-//отрезаем get параметры
+function queryPage ($link, $uri, $table='category') {
+    $query = "SELECT * FROM $table WHERE url='$uri'";
+    $result = mysqli_query($link, $query) or die( mysqli_error($link) );
+    //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
+    return mysqli_fetch_assoc($result);
+}
+
+function checkURL ($link, $uri, $table='category') {
+    $query = "SELECT COUNT(*) as count FROM $table WHERE url='$uri'";
+    $result = mysqli_query($link, $query) or die( mysqli_error($link) );
+    //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
+    return mysqli_fetch_assoc($result)['count'];
+}
+
 $uri = trim(preg_replace('#(\?.*)?#', '', $_SERVER['REQUEST_URI']), '/');
 
-if (empty($uri)) $uri = 'main';
+if (empty($uri)) {
+    $uri = '/';
+}
 
-if ($uri == 'main') {
-
-    query($link, $uri);
-
+if ($uri == '/') {
+    $page = queryPage($link, $uri);
+    $flag = 'main';
 } else {
-
     $uriArr = explode ("/", $uri);
 
     if (count($uriArr) == 2) {
-        if (checkCat($uriArr['0']) AND checkProd($uriArr['1'])) {
-            $page = query($link, $uriArr, 2);
+        if (checkURL($link, $uriArr[0]) AND checkURL($link, $uriArr[1], 'product')) {
+            $page = queryPage($link, $uriArr[1], 'product');
+            $flag = 'product';
         } else {
-            $page = query($link, '404');
+            $page = queryPage($link, '404');
+            $flag = '404';
             header("HTTP/1.0 404 Not Found");
         }
-    } elseif (count($uriArr) == 1 AND checkCat($uriArr['0'])) {
-        $page = query($link, $uriArr, 1);
+    } elseif (count($uriArr) == 1 AND checkURL($link, $uriArr[0])) {
+        $page = queryPage($link, $uriArr[0]);
+        $flag = 'category';
     } else {
-        $page = query($link, '404');
+        $page = queryPage($link, '404');
+        $flag = '404';
         header("HTTP/1.0 404 Not Found");
     }
-
 }
 
-function query ($link, $uri, $i=0) {
+//$title = '';
+//$content = $page['description'];
 
-    if ($i == 1) {
-        $query = "SELECT * FROM pagesj WHERE url='$uri[0]'";
-        $result = mysqli_query($link, $query) or die(mysqli_error($link));
-        return mysqli_fetch_assoc($result);
-    }
-
-    if ($i == 2) {
-
-        $query = "SELECT * FROM pagesj WHERE url='$uri[0]'";
-        $result = mysqli_query($link, $query) or die(mysqli_error($link));
-        $rezCat  = mysqli_fetch_assoc($result);
-
-        $query = "SELECT * FROM pagesj WHERE url='$uri[1]'";
-        $result = mysqli_query($link, $query) or die(mysqli_error($link));
-        $rezProd  = mysqli_fetch_assoc($result);
-    }
-
-    /*$query = "SELECT * FROM pagesj WHERE url='$uri'";
-    $result = mysqli_query($link, $query) or die( mysqli_error($link) );
-    //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
-    return mysqli_fetch_assoc($result);*/
+switch ($flag) {
+    case 'main':
+        include 'elems/template_incl.php';
+        include 'elems/layout_main.php';
+        break;
+    case 'category':
+        $catID = $page['id'];
+        include 'elems/template_incl.php';
+        include 'elems/layout_category.php';
+        break;
+    case 'product':
+        include 'elems/template_incl.php';
+        include 'elems/layout_product.php';
+        break;
+    default:
+        include 'elems/layout_404.php';
+        break;
 }
 
-/*$page = query($link, $uri);
-
-if (!$page) {
-    $page = query($link, '404');
-    header("HTTP/1.0 404 Not Found");
-}
-
-$title = $page['text'];
-$content = $page['text'];
-
-include 'elems/layout.php';*/
-
-echo "<a href=\"admin/\">Перейти в админку</a>";
+//echo "<a href=\"admin/\">Перейти в админку</a>";
 
 /*echo "<pre>";
-var_dump($_SERVER['REQUEST_URI']);
-//var_dump($url);
+var_dump($_SERVER);
 echo "</pre>";*/
