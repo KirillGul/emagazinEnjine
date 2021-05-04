@@ -3,81 +3,44 @@ include 'elems/password.php';
 include '../elems//init.php';
 
 if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
-   $info = '';
    $content = '';
-   $titleValue = '';
-   $urlValue = '';
-   $textValue = '';
-
    $title = 'admin import page';
 
-   function checkPage($link, $urlPOST) {
-      $query = "SELECT COUNT(*) as count FROM pagesj WHERE url='$urlPOST'";
-      $result = mysqli_query($link, $query) or die(mysqli_error($link));
-      return mysqli_fetch_assoc($result)['count'];
-   }
+   if(isset($_GET['id'])) {
+      $uploaddir = 'files/';
+      $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 
-   function addPage($link, $titlePOST, $urlPOST, $textPOST) {
-      $query = "INSERT INTO pagesj SET title='$titlePOST', url='$urlPOST', text='$textPOST'";
-      mysqli_query($link, $query) or die(mysqli_error($link));
-      return checkPage($link, $urlPOST);
-   }
-
-
-   if(isset($_POST['title'])) {
-      $titlePOST = mysqli_real_escape_string($link, $_POST['title']);
-      $titleValue = " value = '$titlePOST'";
-   }
-   if(isset($_POST['url'])) {
-      $urlPOST = mysqli_real_escape_string($link, $_POST['url']);
-      $urlValue = " value = '$urlPOST'";
-   }
-   if(isset($_POST['text'])) {
-      $textPOST = $textValue = mysqli_real_escape_string($link, $_POST['text']);
-   }
-
-   if (!empty($titlePOST) AND !empty($urlPOST)) {
-      if (checkPage($link, $urlPOST) == false) {
-         $add = addPage($link, $titlePOST, $urlPOST, $textPOST);
-
-         if ($add) {
-            $_SESSION['info'] = [
-               'msg' => "Успешно добавленно",
-               'status' => 'success'
-            ];
-            header('Location: /admin/'); die();
-         } else {
-            $_SESSION['info'] = [
-               'msg' => "Ошибка добавления",
-               'status' => 'error'
-            ];
-         }
+      
+      if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+         echo "Файл корректен и был успешно загружен.\n";
       } else {
-         $_SESSION['info'] = [
-            'msg' => "Такой URL существует",
-            'status' => 'error'
-         ];
+         echo "Возможная атака с помощью файловой загрузки!\n";
       }
+
+      $content .= "
+      <br><form method=\"POST\" enctype=\"multipart/form-data\" action=\"\">
+         Выберите файл XML с продуктами:<br>
+         <input type=\"file\" name=\"userfile\"><br>
+			<input type=\"submit\" value=\"Загрузить файл для обработки\">
+      </form><br>";
+
    } else {
       $_SESSION['info'] = [
-         'msg' => "Введите значения title, url, [text]",
-         'status' => 'warning'
+         'msg' => "Ошибка при входе в импорт",
+         'status' => 'error'
       ];
+      header('Location: index.php'); die();
    }
-
-   $content = "<form method=\"POST\">
-   title:<br><input name='title'$titleValue><br><br>
-   url:<br><input name='url'$urlValue><br><br>
-   text:<br><textarea name='text'>$textValue</textarea><br><br>
-   <input type='submit'>
-   </form>";
 
    include 'elems/layout.php';
 
-   /*echo "<pre>";
-   //var_dump($_SERVER['REQUEST_URI']);
-   var_dump($_REQUEST);
-   echo "</pre>";*/
+   echo "<pre>";
+   var_dump($_GET['id']);
+   echo "</pre>";
+
+   /*echo '<pre>';
+   print_r($_FILES);
+   print "</pre>";*/
 } else {
    header('Location: /admin/login.php'); die();
 }
