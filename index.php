@@ -1,7 +1,7 @@
 <?php
 include 'elems/init.php'; //Устанавливаем доступы к базе данных и др. настройки
 
-function queryPage ($link, $uri, $table='category', $param = '*', $all=false) { //запрос всех данных страницы из таблицы
+function queryPageOnURI ($link, $uri, $table='category', $param = '*', $all=false) { //запрос всех данных страницы из таблицы
     $query = "SELECT $param FROM $table WHERE uri='$uri'";
     $result = mysqli_query($link, $query) or die( mysqli_error($link) );
     if ($all === true) {
@@ -44,23 +44,23 @@ if ($uri == '/') { //если главная
 
 switch ($flag) {
     case 'main':
-        $page = queryPage($link, $uri, 'page');
+        $page = queryPageOnURI($link, $uri, 'page');
         include 'elems/mainForLayout.php';
         include 'elems/layout.php';
         break;
     case 'category':
-        $page = queryPage($link, $uriArr[0]);
+        $page = queryPageOnURI($link, $uriArr[0]);
         include 'elems/categoryForLayout.php';
         include 'elems/layout.php';
         break;
     case 'product':
-        $page = queryPage($link, $uriArr[1], 'product');
-        $catID = queryPage($link, $uriArr[0], 'category', 'id')['id'];
+        $page = queryPageOnURI($link, $uriArr[1], 'product');
+        $catID = queryPageOnURI($link, $uriArr[0], 'category', 'id')['id'];
         include 'elems/productForLayout.php';
         include 'elems/layout.php';
         break;
     default:
-        $page = queryPage($link, '404', 'page');
+        $page = queryPageOnURI($link, '404', 'page');
         include 'elems/layout_404.php';
         header("HTTP/1.0 404 Not Found");
         break;

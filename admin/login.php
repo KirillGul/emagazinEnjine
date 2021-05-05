@@ -1,5 +1,4 @@
 <?php
-include 'elems/password.php';
 include '../elems/init.php';
 
 if ((isset($_POST['password']) AND md5($_POST['password']) == $passwordAdmin) OR (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE)) {

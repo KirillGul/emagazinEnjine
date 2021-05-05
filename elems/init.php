@@ -4,6 +4,9 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 'on');
 
+//MD5
+$passwordAdmin = '202cb962ac59075b964b07152d234b70';
+
 //Устанавливаем доступы к базе данных:
 $host = 'localhost'; //имя хоста, на локальном компьютере это localhost
 $user = 'root'; //имя пользователя, по умолчанию это root

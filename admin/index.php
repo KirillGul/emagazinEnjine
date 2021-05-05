@@ -1,10 +1,9 @@
 <?php
-include 'elems/password.php';
 include '../elems/init.php';
 
 ///////////////////////////////////////////////////////////////////////////////////////
 function showPageTable ($link) {
-    $query = "SELECT id, name, url FROM category";
+    $query = "SELECT id, name, uri FROM category";
     $result = mysqli_query($link, $query) or die( mysqli_error($link) );
     //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
     for ($data = []; $row = mysqli_fetch_assoc($result); $data[] = $row);
@@ -31,26 +30,19 @@ function showPageTable ($link) {
         $table .= "<tr>
             <td>{$value['id']}</td>
             <td>{$value['name']}</td>
-            <td>{$value['url']}</td>
+            <td>{$value['uri']}</td>
             <td>$countProduct</td>
             <td><a href=\"import.php?id=$idCat\">Import</a></td>
-            <td><a href=\"?del=$idCat\">Очистить от товаров</a></td>
-            <td><a href=\"?delCat=$idCat\">Удалить категорию</a></td>
+            <td><a href=\"?delProductID=$idCat\">Очистить от товаров</a></td>
+            <td><a href=\"?delCategoryID=$idCat\">Удалить категорию</a></td>
             </tr>";
     }
     return $table .= "</table>";
 }
 
-function deletePages ($link, $idCat, $nameCat='product') {
-
-    $param = 'category_id';
-    if ($nameCat == 'category') {
-        $param = 'id';
-    }
-
+function deletePages ($link, $idCat, $nameCat='product', $param='category_id') { //удаление страниц в таблице и таблиц
     $query = "SELECT * FROM $nameCat WHERE $param='$idCat'";
     $result = mysqli_query($link, $query) or die(mysqli_error($link));
-
     for ($data = []; $row = mysqli_fetch_assoc($result); $data[] = $row);
 
     if ($data) {
@@ -72,7 +64,7 @@ function checkTableInDB ($link, $db_name, $nameTable) {
 }
 
 function checkPage($link, $table, $urlPOST) {
-    $query = "SELECT COUNT(*) as count FROM $table WHERE url='$urlPOST'";
+    $query = "SELECT COUNT(*) as count FROM $table WHERE uri='$urlPOST'";
     $result = mysqli_query($link, $query) or die(mysqli_error($link));
     return mysqli_fetch_assoc($result)['count'];
  }
@@ -80,12 +72,7 @@ function checkPage($link, $table, $urlPOST) {
 /*Начало логики*/
 if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
 
-    /*Выход из авторизации*/
-    if (!empty($_GET['logout']) && $_GET['logout'] == 1) {
-        header('Location: /admin/logout.php'); die();
-    }
-
-    /*Подготовка переменных*/
+/*ПОДГОТОВКА ПЕРЕМЕННЫХ*/
     $content = "<p><a href=\"?logout=1\">Выход</a></p>";
     $title = 'admin main page';
 
@@ -93,12 +80,18 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
     if (isset($_SESSION['info'])) {
         $info = $_SESSION['info'];
     }
-///////////////////////
-    /*Если нажато удаление*/
-    if (!empty($_GET['del'])) {
-        $isDelete = deletePages($link, $_GET['del']);
 
-        if ($isDelete) {
+
+
+/*ОБРАБОТКА GET ЗАПРОСОВ*/    
+    /*Выход из авторизации*/
+    if (!empty($_GET['logout']) && $_GET['logout'] == 1) {
+        header('Location: /admin/logout.php'); die();
+    }
+    
+    /*Если нажато удаление*/
+    if (!empty($_GET['delProductID'])) {
+        if (deletePages($link, $_GET['delProductID'])) {
             $_SESSION['info'] = [
                 'msg' => "Успешно удаленно",
                 'status' => 'success'
@@ -109,8 +102,30 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                 'msg' => "Ошибка удаления",
                 'status' => 'error'
             ];
+            header('Location: /admin/'); die();
         }
     }
+
+    /*Если нажато удаление категории*/
+    if (!empty($_GET['delCategoryID'])) {
+        if (deletePages($link, $_GET['delCategoryID'], 'category', 'id')) {
+            $_SESSION['info'] = [
+                'msg' => "Успешно удаленно",
+                'status' => 'success'
+            ];
+            header('Location: /admin/'); die();
+        } else {
+            $_SESSION['info'] = [
+                'msg' => "Ошибка удаления",
+                'status' => 'error'
+            ];
+            header('Location: /admin/'); die();
+        }
+    }
+
+
+
+    
 ///////////////////////
     /*Добавление категорий если были введены названия в форму*/
     if (isset($_POST['text'])) {
@@ -133,24 +148,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
     } else {
         $textValue = "Введите через '\;' названия категорий";
     }
-///////////////////////
-    /*Если нажато удаление категории*/
-    if (!empty($_GET['delCat'])) {
-        $isDelete = deletePages($link, $_GET['delCat'], 'category');
 
-        if ($isDelete) {
-            $_SESSION['info'] = [
-                'msg' => "Успешно удаленно",
-                'status' => 'success'
-            ];
-            header('Location: /admin/'); die();
-        } else {
-            $_SESSION['info'] = [
-                'msg' => "Ошибка удаления",
-                'status' => 'error'
-            ];
-        }
-    }
 
 ///////////////////////
     /*Проверка инсталяции таблиц в базе*/
