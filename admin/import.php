@@ -1,12 +1,50 @@
 <?php
+//время выполнения скрипта в сек. (0-бесконечно)
+set_time_limit(0);
+
 include 'elems/password.php';
 include '../elems//init.php';
 
+/*установка cookie из формы*/
+if (isset($_POST['check_image_one'])) $checkImage = $_POST['check_image_one'].'';
+else $checkImage = 'No';
+
+if (isset($_POST['check_param_product'])) $checkParam = $_POST['check_param_product'].'';
+else $checkParam = 'No';
+
+if (isset($_POST['check_avaliable'])) $checkAvaliable = $_POST['check_avaliable'].'';
+else $checkAvaliable = 'No';
+
+setcookie("check_image_one", $checkImage);
+setcookie("check_param_product", $checkParam);
+setcookie("check_avaliable", $checkAvaliable);
+
+/*логика*/
 if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
-   $content = '';
    $title = 'admin import page';
 
-   if(isset($_GET['id'])) {
+   $info = '';
+    if (isset($_SESSION['info'])) {
+        $info = $_SESSION['info'];
+    }
+
+   if (isset($_GET['id']) AND isset($_FILES['userfile'])) {
+
+      $content = "
+      <br>
+      <form method=\"POST\" enctype=\"multipart/form-data\">
+         Выберите файл XML с продуктами:<br>
+         <input type=\"file\" name=\"userfile\"><br>
+         <input type=\"submit\" value=\"Загрузить файл для обработки\">
+      </form><br><br>
+      <form method=\"POST\">
+         <span>Загружать все картинки? - <input type=\"checkbox\" value=\"Yes\" name=\"check_image_one\"></span><br>
+         <span>Не загружать параметры товара? - <input type=\"checkbox\" value=\"Yes\" name=\"check_param_product\"></span><br>
+         <span>Загружать товары которые в наличии(true) (использовать только для первичной загрузки) - <input type=\"checkbox\" value=\"Yes\" name=\"check_avaliable\"></span><br><br>
+         <input type=\"submit\" value=\"Подтвердить\">
+      </form><br><br>";
+
+      /*передача через форму*/
       $uploaddir = 'files/';
       $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 
@@ -17,30 +55,251 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
          echo "Возможная атака с помощью файловой загрузки!\n";
       }
 
-      $content .= "
-      <br><form method=\"POST\" enctype=\"multipart/form-data\" action=\"\">
-         Выберите файл XML с продуктами:<br>
-         <input type=\"file\" name=\"userfile\"><br>
-			<input type=\"submit\" value=\"Загрузить файл для обработки\">
-      </form><br>";
+      /*запись файла в базу*/
+	   if (file_exists($uploadfile)) {
+         $xml = $uploadfile;
+         $reader = new XMLReader(); //логика считывания: (элемент начало + атрубуты->значение->элемент конец) и всё через $reader->read();
+
+         //ДЛЯ КАТЕГОРИЙ
+         $reader->open($xml);
+
+         //category
+         $cat = [];
+         while ($reader->read()) { //работает если категории находяться перед товарами
+            if ($reader->name === "category" && $reader->nodeType == XMLReader::ELEMENT) {
+               $temp = $reader->getAttribute('id');
+               $reader->read();				
+               $cat["$temp"] = $reader->value;
+            } elseif (($reader->name == "categories" && $reader->nodeType == XMLReader::END_ELEMENT) || ($reader->name == "offer" && $reader->nodeType == XMLReader::ELEMENT)) break;
+         }
+         //$reader->close();
+         //var_dump($cat);
+         //Конец парсинга категорий
+
+         //ДЛЯ ТОВАРОВ
+         $countProd = 0;
+         $countProdUniq = 0;
+         $countProdAvaliable = 0;
+         $prodArr = [];
+         $prodUrlArr = []; //массив для проверки дублей товаров
+         $categoryId = $_GET['id'];
+
+         //Начало парсинга товаров
+         //$reader->open($xml);
+
+         while ($reader->read()) {
+            $prodAvailable = $prodCategoryId = $prodCurrencyId = $prodDescription = $prodId = $prodModified_time = $prodName = $prodOldPrice = $prodParam = $prodPicture = $prodPrice = $prodType =$prodUrl = $prodVendor = $prodVendorCode = $prodCategory = $prodGroupId = $prodTopSeller = $prod = ''; //обнуление значений
+            
+            if ($reader->name == "offer" && $reader->nodeType == XMLReader::ELEMENT) {
+               $countProd++; //счетчик товаров
+               
+               $prodAvailable = $reader->getAttribute('available')."";
+               
+               if ($_COOKIE['check_avaliable'] == 'Yes') { //пропуск итерации если нет в наличии (при выставленной галочке)
+                  if ($prodAvailable === 'false' or $prodAvailable === 'False'  or $prodAvailable === 'FASLE' or $prodAvailable === '0' or $prodAvailable === 0) continue;
+               }
+               
+               $prodId = $reader->getAttribute('id')."";
+               $prodGroupId = $reader->getAttribute('group_id')."";
+               
+               $countProdAvaliable++; //счетчик товаров
+               $prodPicture = '';
+               $prodParam = '';
+
+               while ($reader->read()) {
+                  if ($reader->nodeType == XMLReader::ELEMENT) { //проверка что это открывающий тег например <item>, а не </item>
+                     switch ($reader->name) {
+                        case "categoryId":
+                           $reader->read();
+                           $prodSubCategoryId = $reader->value;
+                           continue 2;
+                        case "currencyId":
+                           $reader->read();
+                           $prodCurrencyId = $reader->value;
+                           continue 2;
+                        case "description":
+                           $reader->read();
+                           $prodDescription = $reader->value;
+                           $prodDescription = trim($prodDescription); //убираем переносы строк по краям
+                           $prodDescription = str_replace(array("\r\n", "\r", "\n"), ' ', $prodDescription); //убираем переносы строк ввнутри
+                           continue 2;
+                        case "modified_time":
+                           $reader->read();
+                           $prodModified_time = $reader->value;
+                           continue 2;
+                        case "name":
+                           $reader->read();
+                           $prodName = $reader->value;
+                           continue 2;
+                        case "oldprice":
+                           $reader->read();
+                           $prodOldPrice = $reader->value;
+                           continue 2;
+                        case "price":
+                           $reader->read();
+                           $prodPrice = $reader->value;
+                           continue 2;
+                        case "type":
+                           $reader->read();
+                           $prodType = $reader->value;
+                           continue 2;
+                        case "url":
+                           $reader->read();
+                           $prodUrl = $reader->value;
+                           array_push($prodUrlArr, $prodUrl); //для проверки дублей
+                           continue 2;
+                        case "vendor":
+                           $reader->read();
+                           $prodVendor = $reader->value;
+                           continue 2;
+                        case "vendorCode":
+                           $reader->read();
+                           $prodVendorCode = $reader->value;
+                           continue 2;
+                        case "topseller":
+                           $reader->read();
+                           $prodTopSeller = $reader->value;
+                           continue 2;
+                        case "param":
+                           if ($_COOKIE['check_param_product'] == 'Yes') {
+                              $prodParam = '';
+                           } else {
+                              $atrib = $reader->getAttribute('name');
+                              if ($atrib == 'origin_url') continue 2; //пропуск определенной параметра
+                              $reader->read();
+                              $prodParam .= $atrib.':'.$reader->value."&-&-&";
+                           }
+                           continue 2;
+                        case "picture":
+                           if ($_COOKIE['check_image_one'] == 'Yes') {									
+                              $reader->read();
+                              $picture = $reader->value;	
+                              $prodPicture .= $picture."&-&-&";										
+                           } else {
+                              $reader->read();
+                              $prodPicture = $reader->value;
+                           }
+                           continue 2;
+                     }
+                  }
+                  if ($reader->name == "offer" && $reader->nodeType == XMLReader::END_ELEMENT) break;					
+               }
+               
+               $prodSubCategoryName = $cat["$prodSubCategoryId"].""; //добавляем имя категории
+
+               $prod = [
+                  $prodAvailable,
+                  $prodSubCategoryId,
+                  $prodSubCategoryName,
+                  $prodCurrencyId,
+                  $prodDescription,
+                  $prodId,
+                  $prodModified_time,
+                  $prodName,
+                  $prodOldPrice,
+                  $prodParam,
+                  $prodPicture,
+                  $prodPrice,
+                  $prodType,
+                  $prodUrl,
+                  $prodVendor,
+                  $prodVendorCode,                  
+                  $prodGroupId,
+                  $prodTopSeller
+               ];
+               //echo "$prodId<br>";
+               
+               array_push($prodArr, $prod); //записываем данные в массив				
+            }
+         }
+
+         $reader->close();
+		
+         //Запись данных в файл
+         //$f = fopen("../_temp/".trim($value, ".xml").".txt", 'w');
+         
+         //Подготовка массива с дублями
+         $duplicates = array_diff_assoc($prodUrlArr, array_unique($prodUrlArr)); //массив дублей с ключями
+         //var_dump($duplicates);
+         
+         foreach ($prodArr as $key => $value1) {		
+            ///УДАЛЯЕМ ДУБЛИ			
+            if (!array_key_exists($key, $duplicates)) {
+               //fwrite($f, $value1);
+               $countProdUniq++;
+
+               $query = "INSERT INTO product SET 
+               url='$countProdUniq', 
+               available='$prodAvailable', 
+               category_id='$CategoryId',
+               description='$prodDescription',
+               modified_time='$prodModified_time',
+               name='$prodName',
+               oldprice='$prodOldPrice',
+               price='$prodPrice',
+               param='$prodParam',
+               picture='$prodPicture',
+               type='$prodType',
+               vendor='$prodVendor',
+               vendorcode='$prodVendorCode',
+               category='$prodCategory',
+               groupid='$prodGroupId',
+               topseller='$prodTopSeller'
+               ";
+               $result = mysqli_query($link, $query) or die(mysqli_error($link));
+               /*echo '<pre>';
+               print_r($value1);
+               print "</pre>";*/
+
+               $countProdUniq++;
+            }
+            ///--------------------------------------			
+         }
+         //fclose($f);
+
+         //return "<p><img src=\"img/ok.png\"><span>Всего ".$countProd." в наличии(true) - ".$countProdAvaliable." (в т.ч. уник. - ".$countProdUniq.", дубли - ".($countProd-$countProdUniq).") - ".$value." обработан.</span></p>";
+
+         $_SESSION['info'] = [
+            'msg' => "Файл импорта загружен",
+            'status' => 'success'
+         ];
+
+      } else {
+         $_SESSION['info'] = [
+            'msg' => "Файл не найден",
+            'status' => 'error'
+         ];
+      }
+
+      /*удаление файла*/
+      
 
    } else {
       $_SESSION['info'] = [
-         'msg' => "Ошибка при входе в импорт",
-         'status' => 'error'
+         'msg' => "Выберите файл для импорта",
+         'status' => 'warning'
       ];
-      header('Location: index.php'); die();
+      $content = "
+      <br>
+      <form method=\"POST\" enctype=\"multipart/form-data\">
+         Выберите файл XML с продуктами:<br>
+         <input type=\"file\" name=\"userfile\"><br>
+         <input type=\"submit\" value=\"Загрузить файл для обработки\">
+      </form><br><br>
+      <form method=\"POST\">
+         <span>Загружать все картинки? - <input type=\"checkbox\" value=\"Yes\" name=\"check_image_one\"></span><br>
+         <span>Не загружать параметры товара? - <input type=\"checkbox\" value=\"Yes\" name=\"check_param_product\"></span><br>
+         <span>Загружать товары которые в наличии(true) (использовать только для первичной загрузки) - <input type=\"checkbox\" value=\"Yes\" name=\"check_avaliable\"></span><br><br>
+         <input type=\"submit\" value=\"Подтвердить\">
+      </form><br><br>";
    }
 
    include 'elems/layout.php';
 
-   echo "<pre>";
-   var_dump($_GET['id']);
-   echo "</pre>";
-
    /*echo '<pre>';
-   print_r($_FILES);
+   print_r($prodArr);
    print "</pre>";*/
+
 } else {
    header('Location: /admin/login.php'); die();
 }

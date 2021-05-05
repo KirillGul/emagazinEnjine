@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE yml_catalog SYSTEM "shops.dtd">
+            <yml_catalog date="05 May 2021 04:59:43">
+        <shop><name>Thomas Munz</name>
+<company>Thomas Munz</company>
+<url>https://thomas-muenz.ru</url>
+<platform>1C-Bitrix</platform>
+<currencies>
+<currency id="RUB" rate="1"/>
+</currencies>
+<categories>
+<category id="7">Женщинам</category>
+<category id="20" parentId="7">Женская обувь</category>
+<category id="9" parentId="20">Туфли</category>
+<category id="15" parentId="20">Босоножки</category>
+<category id="16" parentId="20">Балетки</category>
+<category id="159" parentId="20">Слипоны</category>
+<category id="210" parentId="20">Кеды</category>
+<category id="158" parentId="20">Кроссовки</category>
+<category id="13" parentId="20">Полуботинки</category>
+<category id="10" parentId="20">Ботинки</category>
+<category id="17" parentId="20">Сандалии</category>
+<category id="22" parentId="20">Сабо</category>
+<category id="18" parentId="20">Мокасины</category>
+<category id="11" parentId="20">Ботильоны</category>
+<category id="19" parentId="20">Полусапоги</category>
+<category id="12" parentId="20">Сапоги</category>
+<category id="14" parentId="20">Ботфорты</category>
+<category id="160" parentId="20">Угги</category>
+<category id="21" parentId="7">Аксессуары</category>
+<category id="189" parentId="21">Зонты</category>
+<category id="26" parentId="21">Перчатки</category>
+<category id="190" parentId="21">Рюкзаки</category>
+<category id="23" parentId="21">Сумки</category>
+<category id="209" parentId="21">Шапки</category>
+<category id="27" parentId="21">Шарфы</category>
+<category id="8">Мужчинам</category>
+<category id="143" parentId="8">Мужская обувь</category>
+<category id="144" parentId="143">Туфли/полуботинки</category>
+<category id="148" parentId="143">Ботинки</category>
+<category id="212" parentId="143">Кеды</category>
+<category id="146" parentId="143">Кроссовки</category>
+<category id="162" parentId="143">Слипоны</category>
+<category id="155" parentId="143">Мокасины</category>
+<category id="154" parentId="143">Сандалии</category>
+<category id="153" parentId="143">Сабо</category>
+<category id="142" parentId="8">Аксессуары</category>
+<category id="150" parentId="142">Бумажники</category>
+<category id="157" parentId="142">Перчатки</category>
+<category id="152" parentId="142">Ремни</category>
+<category id="191" parentId="142">Рюкзаки</category>
+<category id="151" parentId="142">Сумки</category>
+<category id="251" parentId="142">Шарфы</category>
+<category id="220">Детям</category>
+<category id="221" parentId="220">Детская обувь</category>
+<category id="223" parentId="221">Обувь для девочек</category>
+<category id="224" parentId="221">Обувь для мальчиков</category>
+</categories>
+<offers><offer available="true" group_id="36233" id="36441"><categoryId>11</categoryId><currencyId>RUB</currencyId><description>Элегантные ботильоны из натуральной кожи черного цвета станут отличным вариантом выбора обуви на каждый день. Боковая молния и широкий устойчивый каблук высотой 4 см делают их максимально удобными. Сочетание кожи и велюра смотрится особенно эффектно и стильно. Такая модель идеально дополнит различные образы Вашего гардероба.</description><modified_time>1619477930</modified_time><name>Ботильоны Thomas Munz</name><oldprice>9999.00</oldprice><param name="Пол">Жен.</param><param name="Цвет">Черный</param><param name="Тип">Ботильоны женские</param><param name="Сезон">Весна-осень</param><param name="Коллекция">Осень-Зима 2020-2021</param><param name="Материал верха">КРС</param><param name="Материал подкладки">Ворсин</param><param name="Высота каблука">40</param><param name="Размер" unit="RU">36</param><picture>https://thomas-muenz.ru/upload/iblock/772/7725f8523c1168543bb8d8f7bb7a131f.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/7c1/7c16661eafee21f6ee42c59608e643af.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/ef3/ef363cbaf349b521481dd4788eaf975c.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/b47/b47f81291dd04454a43fe276d0f3a582.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/00b/00baea19ff386b55974dc279f0332cdd.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/7dc/7dcb668860cabc6a1775430e420f5894.jpg</picture><price>4999.00</price><url>https://ad.admitad.com/g/c325nf4ak86cb11ce6cba41ae85af7/?i=5&amp;f_id=17910&amp;ulp=https%3A%2F%2Fthomas-muenz.ru%2Fcatalog%2Fwomen%2Fshoes%2Fbotilions%2F233-099b-2101-botinki-zhen-kozha-velyur-vorsin-chern-thomas-munz.php</url><vendor>Thomas Munz</vendor><vendorCode>233-099B-2101</vendorCode></offer>
+<offer available="true" group_id="44469" id="45341"><categoryId>16</categoryId><currencyId>RUB</currencyId><description>Женские балетки из искусственной кожи Bridget в базовом черном цвете станут отличным завершением любого повседневного аутфита. Дизайн элегантен и лаконичен, декор – классический бантик. Гибкая подошва, умная стелька и невысокий каблучок 1,5 см делают модель удобной даже при длительном ношении.</description><modified_time>1619477930</modified_time><name>Балетки Bridget</name><oldprice>3999.00</oldprice><param name="Пол">Жен.</param><param name="Цвет">Черный</param><param name="Тип">Балетки женские</param><param name="Сезон">Всесезонная</param><param name="Коллекция">Весна-Лето 2021</param><param name="Материал верха">Искусственная кожа</param><param name="Материал подкладки">Искусственная кожа</param><param name="Высота каблука">15</param><param name="Размер" unit="RU">38</param><picture>https://thomas-muenz.ru/upload/iblock/411/4118cc8405ec709b84791d6fe738192d.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/3af/3afb2893ecc57f13a5c0a47297d73769.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/1b3/1b3dc7d2ce8e6d9e3da00288a30ee65b.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/efe/efea76ef2f7306b6b777ed9ac45d2d92.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/38f/38f20857a268ec47e192d663b8f8fbd0.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/609/60919ddf2380cf4986050dda30791859.jpg</picture><price>1599.00</price><url>https://ad.admitad.com/g/c325nf4ak86cb11ce6cba41ae85af7/?i=5&amp;f_id=17910&amp;ulp=https%3A%2F%2Fthomas-muenz.ru%2Fcatalog%2Fwomen%2Fshoes%2Fballetflat%2F269-033a-6602-tufli-zhenskie-i-kozha-tekstil-i-kozha-chern-bridget.php</url><vendor>Bridget</vendor><vendorCode>269-033A-6602</vendorCode></offer>
+<offer available="true" group_id="67158" id="67714"><categoryId>144</categoryId><currencyId>RUB</currencyId><modified_time>1619477930</modified_time><name>Туфли/полуботинки MUNZ Shoes</name><oldprice>6950.00</oldprice><param name="Пол">Муж.</param><param name="Цвет">Черный</param><param name="Тип">Полуботинки мужские</param><param name="Сезон">Зима</param><param name="Коллекция">Осень-Зима 2020-2021</param><param name="Материал верха">Кожа из спилка</param><param name="Материал подкладки">Натуральная шерсть</param><param name="Высота каблука">25</param><param name="Размер" unit="RU">42</param><picture>https://thomas-muenz.ru/upload/iblock/c4e/c4ec1f8c8bbd1971c45b8d2fdaf00371.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/945/9459e6adae0bc71f68204a5de3b9aa06.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/1ab/1abb5d8835b52e8b4bcc05dbfb3084d5.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/955/955121f4ec8466c0b9c10947c04be64f.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/e22/e22a5d5c65ff1eb3505fce53604b6356.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/d56/d5608b30c55226503aac51e3faf308c4.jpg</picture><price>3550.00</price><url>https://ad.admitad.com/g/c325nf4ak86cb11ce6cba41ae85af7/?i=5&amp;f_id=17910&amp;ulp=https%3A%2F%2Fthomas-muenz.ru%2Fcatalog%2Fmen%2Fshoes%2Fslippers%2F187-057a-5102-polubotinki-muzhskie-kozh-spilok-kozha-sherst-chern-korich-munz-shoes.php</url><vendor>MUNZ Shoes</vendor><vendorCode>187-057A-5102</vendorCode></offer>
+<offer available="true" group_id="52337" id="52804"><categoryId>148</categoryId><currencyId>RUB</currencyId><description>Стильные мужские зимние ботинки дерби коричневого цвета из натуральной кожи идеально впишутся в гардероб современного мужчины и прекрасно дополнят множество различных образов. Сочетание шнуровки и молнии, а также специально разработанная уникально гибкая подошва, обеспечат непревзойденный комфорт.</description><modified_time>1619477930</modified_time><name>Ботинки Thomas Munz</name><oldprice>9999.00</oldprice><param name="Пол">Муж.</param><param name="Цвет">Коричневый</param><param name="Тип">Ботинки мужские</param><param name="Сезон">Зима</param><param name="Коллекция">Осень-Зима 2020-2021</param><param name="Материал верха">КРС</param><param name="Материал подкладки">Натуральная шерсть</param><param name="Высота каблука">32</param><param name="Размер" unit="RU">40</param><picture>https://thomas-muenz.ru/upload/iblock/d8a/d8aa42994494b9249ffdf5cc0c92384f.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/e07/e07d6e066055df1a8e6a39a6554a4666.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/de9/de9cc0feb41f6100510d38849046c2e7.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/f14/f14b4b4319da5a6f31d57328d229539e.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/eb4/eb4076c26a2a593111a6931744b45bd9.jpg</picture><picture>https://thomas-muenz.ru/upload/iblock/8cb/8cb60cef0f94583e300245b9265159f1.jpg</picture><price>3999.00</price><url>https://ad.admitad.com/g/c325nf4ak86cb11ce6cba41ae85af7/?i=5&amp;f_id=17910&amp;ulp=https%3A%2F%2Fthomas-muenz.ru%2Fcatalog%2Fmen%2Fshoes%2Fboots%2F058-224c-5109-botinki-muzhskie-kozha-sherst-korich-thomas-munz.php</url><vendor>Thomas Munz</vendor><vendorCode>058-224C-5109</vendorCode></offer>
+</offers></shop></yml_catalog>
