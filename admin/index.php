@@ -168,6 +168,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
 ///////////////////////
 
 $content .= "<p><a href=\"install.php\">В install</a></p>";
+$content .= "<p><a href=\"/\">На FrontEnd</a></p>";
 
 /*Добавление категорий*/
 $content .= "<br><p>Добавить категорию</p>";

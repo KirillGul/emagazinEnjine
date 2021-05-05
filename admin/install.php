@@ -33,7 +33,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
         if ($_GET['add'] == 1) {
             $query = "CREATE TABLE IF NOT EXISTS category (
                 `id` INT NOT NULL AUTO_INCREMENT,
-                `url` VARCHAR(256) NOT NULL,
+                `uri` VARCHAR(256) NOT NULL,
                 `name` VARCHAR(256) NOT NULL,
                 PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8 COLLATE utf8_general_ci";
            
@@ -42,7 +42,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
         } elseif ($_GET['add'] == 2) {
             $query = "CREATE TABLE IF NOT EXISTS product (
                 `id` INT NOT NULL AUTO_INCREMENT,
-                `url` VARCHAR(256) NOT NULL,
+                `uri` VARCHAR(256) NOT NULL,
                 `available` VARCHAR(256) NOT NULL,
                 `category_id` VARCHAR(256) NOT NULL,
                 `category_sub_id` VARCHAR(256) NULL DEFAULT NULL,
@@ -54,10 +54,10 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                 `price` VARCHAR(256) NOT NULL,
                 `param` TEXT NULL DEFAULT NULL,
                 `picture` TEXT NULL DEFAULT NULL,
-                `type` VARCHAR(256) NULL DEFAULT NULL,                
+                `type` VARCHAR(256) NULL DEFAULT NULL,
+                `produrl` VARCHAR(256) NOT NULL,          
                 `vendor` VARCHAR(256) NULL DEFAULT NULL,
                 `vendorcode` VARCHAR(256) NULL DEFAULT NULL,
-                `category` VARCHAR(256) NULL DEFAULT NULL,
                 `groupid` VARCHAR(256) NOT NULL,
                 `topseller` VARCHAR(256) NULL DEFAULT NULL,
                 PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8 COLLATE utf8_general_ci";
@@ -67,9 +67,8 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
         } elseif ($_GET['add'] == 3) {
             $query = "CREATE TABLE IF NOT EXISTS page (
                 `id` INT NOT NULL AUTO_INCREMENT,
-                `url` VARCHAR(256) NOT NULL,
+                `uri` VARCHAR(256) NOT NULL,
                 `name` VARCHAR(256) NOT NULL,
-                `text` TEXT NULL DEFAULT NULL,
                 PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8 COLLATE utf8_general_ci";
 
             $result = mysqli_query($link, $query) or die(mysqli_error($link));

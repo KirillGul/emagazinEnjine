@@ -88,7 +88,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
          //$reader->open($xml);
 
          while ($reader->read()) {
-            $prodAvailable = $prodCategoryId = $prodCurrencyId = $prodDescription = $prodId = $prodModified_time = $prodName = $prodOldPrice = $prodParam = $prodPicture = $prodPrice = $prodType =$prodUrl = $prodVendor = $prodVendorCode = $prodCategory = $prodGroupId = $prodTopSeller = $prod = ''; //обнуление значений
+            $prodAvailable = $prodCategoryId = $prodCurrencyId = $prodDescription = $prodId = $prodModified_time = $prodName = $prodOldPrice = $prodParam = $prodPicture = $prodPrice = $prodType =$prodUrl = $prodVendor = $prodVendorCode = $prodGroupId = $prodTopSeller = $prod = ''; //обнуление значений
             
             if ($reader->name == "offer" && $reader->nodeType == XMLReader::ELEMENT) {
                $countProd++; //счетчик товаров
@@ -188,24 +188,24 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                $prodSubCategoryName = $cat["$prodSubCategoryId"].""; //добавляем имя категории
 
                $prod = [
-                  $prodAvailable,
-                  $prodSubCategoryId,
-                  $prodSubCategoryName,
-                  $prodCurrencyId,
-                  $prodDescription,
-                  $prodId,
-                  $prodModified_time,
-                  $prodName,
-                  $prodOldPrice,
-                  $prodParam,
-                  $prodPicture,
-                  $prodPrice,
-                  $prodType,
-                  $prodUrl,
-                  $prodVendor,
-                  $prodVendorCode,                  
-                  $prodGroupId,
-                  $prodTopSeller
+                  'available'=>$prodAvailable,
+                  'subcategoryid'=>$prodSubCategoryId,
+                  'subcategoryname'=>$prodSubCategoryName,
+                  'CurrencyId'=>$prodCurrencyId,
+                  'description'=>$prodDescription,
+                  'Id'=>$prodId,
+                  'modifiedtime'=>$prodModified_time,
+                  'name'=>$prodName,
+                  'oldprice'=>$prodOldPrice,
+                  'param'=>$prodParam,
+                  'picture'=>$prodPicture,
+                  'price'=>$prodPrice,
+                  'type'=>$prodType,
+                  'produrl'=>$prodUrl,
+                  'vendor'=>$prodVendor,
+                  'vendorcode'=>$prodVendorCode,                  
+                  'groupid'=>$prodGroupId,
+                  'topseller'=>$prodTopSeller
                ];
                //echo "$prodId<br>";
                
@@ -222,36 +222,53 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
          $duplicates = array_diff_assoc($prodUrlArr, array_unique($prodUrlArr)); //массив дублей с ключями
          //var_dump($duplicates);
          
-         foreach ($prodArr as $key => $value1) {		
+         foreach ($prodArr as $key => $value1) {
             ///УДАЛЯЕМ ДУБЛИ			
             if (!array_key_exists($key, $duplicates)) {
                //fwrite($f, $value1);
                $countProdUniq++;
 
+               $available = $value1['available'].'';
+               $subcategoryid = $value1['subcategoryid'].'';
+               $subcategoryname = $value1['subcategoryname'].'';
+               $description = $value1['description'].'';
+               $modifiedtime = $value1['modifiedtime'].'';
+               $name = $value1['name'].'';
+               $oldprice = $value1['oldprice'].'';
+               $price = $value1['price'].'';
+               $param = $value1['param'].'';
+               $picture = $value1['picture'].'';
+               $type = $value1['type'].'';
+               $produrl = $value1['produrl'].'';
+               $vendor = $value1['vendor'].'';
+               $vendorcode = $value1['vendorcode'].'';
+               $groupid = $value1['groupid'].'';
+               $topseller = $value1['topseller'].'';
+
                $query = "INSERT INTO product SET 
                url='$countProdUniq', 
-               available='$prodAvailable', 
-               category_id='$CategoryId',
-               description='$prodDescription',
-               modified_time='$prodModified_time',
-               name='$prodName',
-               oldprice='$prodOldPrice',
-               price='$prodPrice',
-               param='$prodParam',
-               picture='$prodPicture',
-               type='$prodType',
-               vendor='$prodVendor',
-               vendorcode='$prodVendorCode',
-               category='$prodCategory',
-               groupid='$prodGroupId',
-               topseller='$prodTopSeller'
+               available='$available', 
+               category_id='$categoryId',
+               category_sub_id='$subcategoryid',
+               category_sub_name='$subcategoryname',
+               description='$description',
+               modified_time='$modifiedtime',
+               name='$name',
+               oldprice='$oldprice',
+               price='$price',
+               param='$param',
+               picture='$picture',
+               type='$type',
+               produrl='$produrl',
+               vendor='$vendor',
+               vendorcode='$vendorcode',
+               groupid='$groupid',
+               topseller='$topseller'
                ";
                $result = mysqli_query($link, $query) or die(mysqli_error($link));
                /*echo '<pre>';
                print_r($value1);
                print "</pre>";*/
-
-               $countProdUniq++;
             }
             ///--------------------------------------			
          }
@@ -294,10 +311,12 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
       </form><br><br>";
    }
 
+   $content .= "<p><a href=\"index.php\">В админку</a></p>";
+
    include 'elems/layout.php';
 
    /*echo '<pre>';
-   print_r($prodArr);
+   print_r($cat);
    print "</pre>";*/
 
 } else {
