@@ -25,7 +25,7 @@ $uri = trim(preg_replace('#(\?.*)?#', '', $_SERVER['REQUEST_URI']), '/'); //от
 if (empty($uri)) //если после отразания ни чего нет, то главная
     $uri = '/';
 
-if ($uri == '/') { //если главная   
+if ($uri == '/') { //если главная
     $flag = 'main';
 } else { //если не главная
     $uriArr = explode ("/", $uri);
@@ -61,7 +61,7 @@ switch ($flag) {
         break;
     default:
         $page = queryPageOnURI($link, '404', 'page');
-        include 'elems/layout_404.php';
         header("HTTP/1.0 404 Not Found");
+        include 'elems/layout_404.php';
         break;
 }

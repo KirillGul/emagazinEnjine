@@ -1,48 +1,82 @@
 <?php
-//время выполнения скрипта в сек. (0-бесконечно)
-set_time_limit(0);
+set_time_limit(0); //время выполнения скрипта в сек. (0-бесконечно)
 
-include 'elems/password.php';
 include '../elems//init.php';
 
-/*установка cookie из формы*/
-if (isset($_POST['check_image_one'])) $checkImage = $_POST['check_image_one'].'';
-else $checkImage = 'No';
+/*УСТАНОВКА ЗНАЧЕНИЙ МАССИВА $_COOKIE*/
+   if (isset($_POST['check_image_one'])) $checkImage = $_POST['check_image_one'].'';
+   else $checkImage = 'No';
 
-if (isset($_POST['check_param_product'])) $checkParam = $_POST['check_param_product'].'';
-else $checkParam = 'No';
+   if (isset($_POST['check_param_product'])) $checkParam = $_POST['check_param_product'].'';
+   else $checkParam = 'No';
 
-if (isset($_POST['check_avaliable'])) $checkAvaliable = $_POST['check_avaliable'].'';
-else $checkAvaliable = 'No';
+   if (isset($_POST['check_avaliable'])) $checkAvaliable = $_POST['check_avaliable'].'';
+   else $checkAvaliable = 'No';
 
-setcookie("check_image_one", $checkImage);
-setcookie("check_param_product", $checkParam);
-setcookie("check_avaliable", $checkAvaliable);
+   setcookie("check_image_one", $checkImage);
+   setcookie("check_param_product", $checkParam);
+   setcookie("check_avaliable", $checkAvaliable);
 
-/*логика*/
+function printTableImport ($checkImage, $checkParam, $checkAvaliable) {
+   if($checkImage == 'Yes') $rezultcheckImage = 'checked';
+   else $rezultcheckImage = '';
+
+   if($checkParam == 'Yes') $rezultcheckParam = 'checked';
+   else $rezultcheckParam = '';
+
+   if($checkAvaliable == 'Yes') $rezultcheckAvaliable = 'checked';
+   else $rezultcheckAvaliable = '';
+
+   return $rezult = "
+   <table>
+   <form method=\"POST\" enctype=\"multipart/form-data\">
+      <tr>
+         <td><input type=\"file\" name=\"userfile\"></td>
+         <td><input type=\"submit\" value=\"Загрузить файл для обработки\"></td>
+      </tr>         
+   </form>
+   </table>
+   <br>
+   <table>
+   <form method=\"POST\">
+      <tr>
+         <td><span>Загружать все картинки? - </td>
+         <td><input type=\"checkbox\" value=\"Yes\" name=\"check_image_one\" $rezultcheckImage></span></td>
+         <td><input type=\"submit\" value=\"Подтвердить\"></td>
+      </tr>
+      <tr>
+         <td><span>Не загружать параметры товара? - </td>
+         <td><input type=\"checkbox\" value=\"Yes\" name=\"check_param_product\" $rezultcheckParam></span></td>
+         <td><input type=\"submit\" value=\"Подтвердить\"></td>
+      </tr>
+      <tr>
+         <td><span>Загружать товары которые в наличии(true) (использовать только для первичной загрузки) - </td>
+         <td><input type=\"checkbox\" value=\"Yes\" name=\"check_avaliable\" $rezultcheckAvaliable></span></td>
+         <td><input type=\"submit\" value=\"Подтвердить\"></td>
+      </tr>
+   </form>
+   </table>";
+}
+
+
 if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
+
+/*ПОДГОТОВКА ПЕРЕМЕННЫХ*/
    $title = 'admin import page';
 
    $info = '';
-    if (isset($_SESSION['info'])) {
-        $info = $_SESSION['info'];
-    }
+   if (isset($_SESSION['info'])) {
+      $info = $_SESSION['info'];
+   }
 
+   $content = '';
+
+
+   
+/*ЛОГИКА*/
    if (isset($_GET['id']) AND isset($_FILES['userfile'])) {
 
-      $content = "
-      <br>
-      <form method=\"POST\" enctype=\"multipart/form-data\">
-         Выберите файл XML с продуктами:<br>
-         <input type=\"file\" name=\"userfile\"><br>
-         <input type=\"submit\" value=\"Загрузить файл для обработки\">
-      </form><br><br>
-      <form method=\"POST\">
-         <span>Загружать все картинки? - <input type=\"checkbox\" value=\"Yes\" name=\"check_image_one\"></span><br>
-         <span>Не загружать параметры товара? - <input type=\"checkbox\" value=\"Yes\" name=\"check_param_product\"></span><br>
-         <span>Загружать товары которые в наличии(true) (использовать только для первичной загрузки) - <input type=\"checkbox\" value=\"Yes\" name=\"check_avaliable\"></span><br><br>
-         <input type=\"submit\" value=\"Подтвердить\">
-      </form><br><br>";
+      $content = printTableImport($checkImage, $checkParam, $checkAvaliable);
 
       /*передача через форму*/
       $uploaddir = 'files/';
@@ -214,18 +248,14 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
          }
 
          $reader->close();
-		
-         //Запись данных в файл
-         //$f = fopen("../_temp/".trim($value, ".xml").".txt", 'w');
          
          //Подготовка массива с дублями
          $duplicates = array_diff_assoc($prodUrlArr, array_unique($prodUrlArr)); //массив дублей с ключями
-         //var_dump($duplicates);
          
          foreach ($prodArr as $key => $value1) {
             ///УДАЛЯЕМ ДУБЛИ			
             if (!array_key_exists($key, $duplicates)) {
-               //fwrite($f, $value1);
+               
                $countProdUniq++;
 
                $available = $value1['available'].'';
@@ -246,7 +276,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                $topseller = $value1['topseller'].'';
 
                $query = "INSERT INTO product SET 
-               url='$countProdUniq', 
+               uri='$countProdUniq', 
                available='$available', 
                category_id='$categoryId',
                category_sub_id='$subcategoryid',
@@ -266,22 +296,16 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                topseller='$topseller'
                ";
                $result = mysqli_query($link, $query) or die(mysqli_error($link));
-               /*echo '<pre>';
-               print_r($value1);
-               print "</pre>";*/
-            }
-            ///--------------------------------------			
+            }		
          }
-         //fclose($f);
-
-         //return "<p><img src=\"img/ok.png\"><span>Всего ".$countProd." в наличии(true) - ".$countProdAvaliable." (в т.ч. уник. - ".$countProdUniq.", дубли - ".($countProd-$countProdUniq).") - ".$value." обработан.</span></p>";
 
          $_SESSION['info'] = [
-            'msg' => "Файл импорта загружен",
+            'msg' => "Файл импорта загружен<br><span>Всего ".$countProd." в наличии(true) - ".$countProdAvaliable." (в т.ч. уник. - ".$countProdUniq.", дубли - ".($countProd-$countProdUniq).")</span>",
             'status' => 'success'
          ];
 
       } else {
+
          $_SESSION['info'] = [
             'msg' => "Файл не найден",
             'status' => 'error'
@@ -289,29 +313,15 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
       }
 
       /*удаление файла*/
-      
+      unlink($uploadfile);
 
    } else {
       $_SESSION['info'] = [
-         'msg' => "Выберите файл для импорта",
+         'msg' => "Выберите файл для импорта (будут загружены только уникальные значения)",
          'status' => 'warning'
       ];
-      $content = "
-      <br>
-      <form method=\"POST\" enctype=\"multipart/form-data\">
-         Выберите файл XML с продуктами:<br>
-         <input type=\"file\" name=\"userfile\"><br>
-         <input type=\"submit\" value=\"Загрузить файл для обработки\">
-      </form><br><br>
-      <form method=\"POST\">
-         <span>Загружать все картинки? - <input type=\"checkbox\" value=\"Yes\" name=\"check_image_one\"></span><br>
-         <span>Не загружать параметры товара? - <input type=\"checkbox\" value=\"Yes\" name=\"check_param_product\"></span><br>
-         <span>Загружать товары которые в наличии(true) (использовать только для первичной загрузки) - <input type=\"checkbox\" value=\"Yes\" name=\"check_avaliable\"></span><br><br>
-         <input type=\"submit\" value=\"Подтвердить\">
-      </form><br><br>";
+      $content = printTableImport($checkImage, $checkParam, $checkAvaliable);
    }
-
-   $content .= "<p><a href=\"index.php\">В админку</a></p>";
 
    include 'elems/layout.php';
 

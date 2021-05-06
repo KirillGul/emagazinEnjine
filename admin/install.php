@@ -1,10 +1,9 @@
 <?php
-include 'elems/password.php';
 include '../elems/init.php';
 
 if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
 
-    function checkTableInDB ($link, $db_name, $nameTable) {
+    function checkTable ($link, $db_name, $nameTable) {
         $query = "SHOW TABLES FROM $db_name LIKE '$nameTable'";
         $result = mysqli_query($link, $query) or die(mysqli_error($link));
         return mysqli_fetch_assoc($result);
@@ -24,6 +23,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
             'status' => 'error'
         ];
     }
+///////////////////////////////////////////////////////////////////////////////////////
 
     $title = 'admin install page';
 
@@ -55,7 +55,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                 `param` TEXT NULL DEFAULT NULL,
                 `picture` TEXT NULL DEFAULT NULL,
                 `type` VARCHAR(256) NULL DEFAULT NULL,
-                `produrl` VARCHAR(256) NOT NULL,          
+                `produrl` TEXT NOT NULL,          
                 `vendor` VARCHAR(256) NULL DEFAULT NULL,
                 `vendorcode` VARCHAR(256) NULL DEFAULT NULL,
                 `groupid` VARCHAR(256) NOT NULL,
@@ -73,7 +73,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
 
             $result = mysqli_query($link, $query) or die(mysqli_error($link));
 
-            $query = "INSERT INTO page (name, url, text) VALUES ('main', '/', 'main'), ('404', '404', '404')";
+            $query = "INSERT INTO page (name, uri) VALUES ('main', '/'), ('404', '404')";
             $result = mysqli_query($link, $query) or die(mysqli_error($link));
 
         }
@@ -119,7 +119,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
     </tr>";
 
     /*Проверка таблицы category в базе*/
-    $rezCategory = checkTableInDB($link, $db_name, $nameTable = 'category');
+    $rezCategory = checkTable($link, $db_name, $nameTable = 'category');
     $content .= "<tr><td>1</td><td>'category'</td>";
     if (!isset($rezCategory)) {
         $content .= "
@@ -134,7 +134,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
     }
 
     /*Проверка таблицы product в базе*/
-    $rezProduct = checkTableInDB ($link, $db_name, $nameTable = 'product');
+    $rezProduct = checkTable ($link, $db_name, $nameTable = 'product');
     $content .= "<tr><td>2</td><td>'product'</td>";
     if (!isset($rezProduct)) {
         $content .= "
@@ -149,7 +149,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
     }
 
     /*Проверка таблицы page в базе*/
-    $rezStaticPage = checkTableInDB ($link, $db_name, $nameTable = 'page');
+    $rezStaticPage = checkTable ($link, $db_name, $nameTable = 'page');
     $content .= "<tr><td>3</td><td>'page'</td>";
     if (!isset($rezStaticPage)) {
         $content .= "
@@ -165,7 +165,6 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
 
 
     $content .= "</table>";
-    $content .= "<p><a href=\"index.php\">В админку</a></p>";
 
     include 'elems/layout.php';
 

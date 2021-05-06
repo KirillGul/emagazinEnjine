@@ -10,15 +10,12 @@
 <body>
     <div id="wrapper">
         <header>
-            header
+            <?php include 'elems/header.php' ?>
         </header>
         <main>
             <?php include 'elems/info.php' ?>
             <?= $content ?>
         </main>
-        <footer>
-            footer
-        </footer>
     </div>
 </body>
 </html>

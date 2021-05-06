@@ -1,7 +1,6 @@
 <?php
 include '../elems/init.php';
 
-///////////////////////////////////////////////////////////////////////////////////////
 function showPageTable ($link) {
     $query = "SELECT id, name, uri FROM category";
     $result = mysqli_query($link, $query) or die( mysqli_error($link) );
@@ -57,23 +56,42 @@ function deletePages ($link, $idCat, $nameCat='product', $param='category_id') {
     } else return true;
 }
 
-function checkTableInDB ($link, $db_name, $nameTable) {
+function checkTable ($link, $db_name, $nameTable) {
     $query = "SHOW TABLES FROM $db_name LIKE '$nameTable'";
     $result = mysqli_query($link, $query) or die(mysqli_error($link));
     return mysqli_fetch_assoc($result);
 }
 
-function checkPage($link, $table, $urlPOST) {
-    $query = "SELECT COUNT(*) as count FROM $table WHERE uri='$urlPOST'";
-    $result = mysqli_query($link, $query) or die(mysqli_error($link));
-    return mysqli_fetch_assoc($result)['count'];
+ function checkURI ($link, $uri, $table='category') { //запрос существования страницы в таблице
+    $query = "SELECT COUNT(*) as count FROM $table WHERE uri='$uri'";
+    $result = mysqli_query($link, $query) or die( mysqli_error($link) );
+    return mysqli_fetch_assoc($result)['count']; //Преобразуем то, что отдала нам база из объекта в нормальный массив с одним значением и значение count
+}
+
+function getTranslit ($str) {
+    $arr = ['a'=>'a', 'б'=>'b', 'в'=>'v', 'г'=>'g', 
+       'д'=>'d', 'е'=>'e', 'ё'=>'e', 'ж'=>'zh', 'з'=>'z', 
+       'и'=>'i', 'й'=>'i', 'к'=>'k', 'л'=>'l', 'м'=>'m', 
+       'н'=>'n', 'о'=>'o', 'п'=>'p', 'р'=>'r', 'с'=>'s', 
+       'т'=>'t', 'у'=>'u', 'ф'=>'f', 'х'=>'kh', 'ц'=>'ts', 
+       'ч'=>'ch', 'ш'=>'sh', 'щ'=>'shch', 'ъ'=>'ie', 'ы'=>'y', 
+       'ь'=>'', 'э'=>'e', 'ю'=>'iu', 'я'=>'ia'];
+ 
+    foreach (preg_split('/(?<!^)(?!$)/u', $str) as $value) {
+        if (!empty($arr[$value])) {
+            $arrTranslit[] = $arr[$value];
+        } else {
+            $arrTranslit[] = $value;
+        }
+    }
+    return $arrTranslit;
  }
 ///////////////////////////////////////////////////////////////////////////////////////
 /*Начало логики*/
 if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
 
 /*ПОДГОТОВКА ПЕРЕМЕННЫХ*/
-    $content = "<p><a href=\"?logout=1\">Выход</a></p>";
+    $content = "";
     $title = 'admin main page';
 
     $info = '';
@@ -83,7 +101,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
 
 
 
-/*ОБРАБОТКА GET ЗАПРОСОВ*/    
+/*ОБРАБОТКА GET ЗАПРОСОВ*/ 
     /*Выход из авторизации*/
     if (!empty($_GET['logout']) && $_GET['logout'] == 1) {
         header('Location: /admin/logout.php'); die();
@@ -125,20 +143,22 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
 
 
 
-    
-///////////////////////
+/*ОБРАБОТКА POST ЗАПРОСОВ*/
     /*Добавление категорий если были введены названия в форму*/
     if (isset($_POST['text'])) {
         $textValue = $_POST['text'];
 
-        $arrCat = explode (";", $textValue);
+        $arrCat = explode ("\n", $textValue);
 
         foreach ($arrCat as $value) {
-            $nameCat =  $value;
-            $urlCat =  strtolower(str_replace(' ', '-', $value));
+            $nameCat =  (str_replace('.xml', '', $value)); //убрать .xml
+            $nameCat =  trim($nameCat);
 
-            if (checkPage($link, 'category', $urlCat) == false) {
-                $query = "INSERT INTO category SET name=' $nameCat', url='$urlCat'";
+            $uriCat = mb_strtolower(str_replace(' ', '-', $nameCat)); //перевод в нижн. регистр и замена пробелов на тире 
+            $uriCat = implode('', getTranslit($uriCat));
+
+            if (checkURI($link, $uriCat , 'category') == false) {
+                $query = "INSERT INTO category SET name=' $nameCat', uri='$uriCat'";
                 $result = mysqli_query($link, $query) or die(mysqli_error($link));
             }
         }
@@ -146,36 +166,39 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
         header('Location: index.php'); die();
 
     } else {
-        $textValue = "Введите через '\;' названия категорий";
+        $textValue = "Введите названия категорий (каждую категорию с новой строки)";
     }
 
 
-///////////////////////
+
+/*ВЫВОД НА ЭКРАН ТАБЛИЦ*/
     /*Проверка инсталяции таблиц в базе*/
-    $rezStaticPage = checkTableInDB ($link, $db_name, $nameTable = 'page');
-    $rezCategory = checkTableInDB($link, $db_name, $nameTable = 'category');
-    $rezProduct = checkTableInDB ($link, $db_name, $nameTable = 'product');    
+    $rezStaticPage = checkTable ($link, $db_name, $nameTable = 'page');
+    $rezCategory = checkTable($link, $db_name, $nameTable = 'category');
+    $rezProduct = checkTable ($link, $db_name, $nameTable = 'product');    
 
     if (!isset($rezStaticPage) || !isset($rezCategory) || !isset($rezProduct)) {
-    /*Если не созданы таблицы*/
+        /*Если не созданы таблицы*/
         header('Location: /admin/install.php'); die();        
     } else {
-    /*Если все создано вывод на экран*/
+        /*Если все создано вывод на экран*/
         $content .= showPageTable($link);
     }
-///////////////////////
 
-$content .= "<p><a href=\"install.php\">В install</a></p>";
-$content .= "<p><a href=\"/\">На FrontEnd</a></p>";
+    /*Добавление категорий*/
+    $content .= "<br><br><p>ДОБАВЛЕНИЕ КАТЕГОРИЙ</p>";
+    $content .= "<table><tr>";
+    $content .= "<td>";
+    $content .= "<form method=\"POST\">
+            <textarea name=\"text\" style=\"width:500px; height:300px;\">$textValue</textarea><br><br>
+            <input type=\"submit\">
+        </form>";
+    $content .= "</td>";
+    $content .= "</tr></table>";
 
-/*Добавление категорий*/
-$content .= "<br><p>Добавить категорию</p>";
-$content .= "
-<form method=\"POST\">
-Name:<textarea name='text'>$textValue</textarea><br><br>
-<input type=\"submit\">
-</form>";
 
+        
+/*КОНЕЦ*/    
     include 'elems/layout.php';
 } else {
     header('Location: /admin/login.php'); die();
