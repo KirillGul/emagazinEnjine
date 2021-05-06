@@ -36,6 +36,7 @@
             <?= $h1 ?>
             <?php if(!empty($countProduct)) echo $countProduct; //категория?>
             <?php if(!empty($pag)) echo $pag; //категория?>
+            <?php if(!empty($itemscope)) echo $itemscope; //товар?>
             <?= $content ?>
             <?php if(!empty($pag)) echo $pag; //категория?>
             <div class="clrb"></div>

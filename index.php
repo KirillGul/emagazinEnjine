@@ -55,7 +55,7 @@ switch ($flag) {
         break;
     case 'product':
         $page = queryPageOnURI($link, $uriArr[1], 'product');
-        $catID = queryPageOnURI($link, $uriArr[0], 'category', 'id')['id'];
+        $cat = queryPageOnURI($link, $uriArr[0], 'category');
         include 'elems/productForLayout.php';
         include 'elems/layout.php';
         break;
