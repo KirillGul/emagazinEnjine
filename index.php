@@ -12,8 +12,8 @@ function queryPageOnURI ($link, $uri, $table='category', $param = '*', $all=fals
     }
 }
 
-function checkURI ($link, $uri, $table='category') { //запрос существования страницы в таблице
-    $query = "SELECT COUNT(*) as count FROM $table WHERE uri='$uri'";
+function checkURI ($link, $uri, $table='category', $param='uri') { //запрос существования страницы в таблице
+    $query = "SELECT COUNT(*) as count FROM $table WHERE $param='$uri'";
     $result = mysqli_query($link, $query) or die( mysqli_error($link) );
     return mysqli_fetch_assoc($result)['count']; //Преобразуем то, что отдала нам база из объекта в нормальный массив с одним значением и значение count
 }
@@ -37,6 +37,14 @@ if ($uri == '/') { //если главная
         } else {
             $flag = '404';
         }
+    } elseif (count($uriArr) == 4 AND $uriArr[0] === 'cart' AND 
+                ($uriArr[3] === 'photoinproduct' || $uriArr[3] === 'morephoto' || 
+                $uriArr[3] === 'buybutton' || $uriArr[3] === 'readmore' || $uriArr[3] === 'othercolors' || $uriArr[3] === 'othersizes')) {
+            if (checkURI($link, $uriArr[1], 'category', 'id') AND checkURI($link, $uriArr[2], 'product')) {
+                $flag = 'cpa';
+            } else {
+                $flag = '404';
+            }
     } else { //если больше второго уровня
         $flag = '404';
     }
@@ -58,6 +66,11 @@ switch ($flag) {
         $cat = queryPageOnURI($link, $uriArr[0], 'category');
         include 'elems/productForLayout.php';
         include 'elems/layout.php';
+        break;
+    case 'cpa':
+        echo "OK";
+        //include 'elems/productForLayout.php';
+        //include 'elems/layout.php';
         break;
     default:
         $page = queryPageOnURI($link, '404', 'page');
