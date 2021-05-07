@@ -262,8 +262,10 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                $subcategoryid = $value1['subcategoryid'].'';
                $subcategoryname = $value1['subcategoryname'].'';
                $description = $value1['description'].'';
+               $description = str_replace("'", "\'", $description);
                $modifiedtime = $value1['modifiedtime'].'';
                $name = $value1['name'].'';
+               $name = str_replace("'", "\'", $name);
                $oldprice = $value1['oldprice'].'';
                $price = $value1['price'].'';
                $param = $value1['param'].'';
@@ -295,6 +297,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                groupid='$groupid',
                topseller='$topseller'
                ";
+               //echo "<br>";
                $result = mysqli_query($link, $query) or die(mysqli_error($link));
             }		
          }

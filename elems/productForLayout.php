@@ -15,8 +15,6 @@ $catID = $cat['id'];
 $catName = $cat['name'];
 $catURI = $cat['uri'];
 
-$prefhostHTTP = 'http://';
-$hostHTTP = $_SERVER['HTTP_HOST'];
 $request_uri = $_SERVER['REQUEST_URI'];
 
 $title = "<title>$prodName $vendorCode, цена $price р., фото и отзывы</title>";
