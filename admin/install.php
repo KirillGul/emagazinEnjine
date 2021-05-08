@@ -60,6 +60,8 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                 `vendorcode` VARCHAR(256) NULL DEFAULT NULL,
                 `groupid` VARCHAR(256) NOT NULL,
                 `topseller` VARCHAR(256) NULL DEFAULT NULL,
+                `similar_products` VARCHAR(256) NULL DEFAULT NULL,
+                `other_online_stores` VARCHAR(256) NULL DEFAULT NULL,
                 PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8 COLLATE utf8_general_ci";
 
             $result = mysqli_query($link, $query) or die(mysqli_error($link));

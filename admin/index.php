@@ -1,4 +1,6 @@
 <?php
+set_time_limit(0); //время выполнения скрипта в сек. (0-бесконечно)
+
 include '../elems/init.php';
 
 function showPageTable ($link) {
@@ -15,7 +17,9 @@ function showPageTable ($link) {
         <th>URL</th>
         <th>Count</th>
         <th>ImportXML</th>
-        <th>Очистить</th>
+        <th>Сгенерировать похожие<br>товары</th>
+        <th>Сгенерировать другие<br>интернет-магазины</th>
+        <th>Очистить</th>        
         <th>Удалить</th>
         </tr>";
     foreach ($data as $value) {
@@ -26,13 +30,24 @@ function showPageTable ($link) {
         //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
         $countProduct = mysqli_fetch_assoc($result)['count'];
 
+        $query = "SELECT COUNT(*) as count FROM category";
+        $result = mysqli_query($link, $query) or die( mysqli_error($link) );
+        //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
+        $countCategory = mysqli_fetch_assoc($result)['count'];
+
         $table .= "<tr>
             <td>{$value['id']}</td>
             <td>{$value['name']}</td>
             <td>{$value['uri']}</td>
             <td>$countProduct</td>
-            <td><a href=\"import.php?id=$idCat\">Import</a></td>
-            <td><a href=\"?delProductID=$idCat\">Очистить от товаров</a></td>
+            <td><a href=\"import.php?id=$idCat\">Import</a></td>";
+
+        if ($countProduct > 7)
+            $table .= "<td><a href=\"?generetionUniq=$idCat&countProd=$countProduct\">Похожие товары<br>(той же категории)</a></td>";
+        else $table .= "<td>В категории мало товаров для генерации</td>";
+
+        $table .= "<td><a href=\"?generetionOtherIMUniq=$idCat&countCategory=$countCategory\">Другие интернет-мгазины</a></td>";
+        $table .= "<td><a href=\"?delProductID=$idCat\">Очистить от товаров</a></td>
             <td><a href=\"?delCategoryID=$idCat\">Удалить категорию</a></td>
             </tr>";
     }
@@ -85,6 +100,15 @@ function getTranslit ($str) {
         }
     }
     return $arrTranslit;
+ }
+
+ function prodStartGen ($countProd, $lim) {
+    $prodRand = rand(0 ,$countProd);
+
+    if ($countProd < $prodRand+$lim) {
+        $prodRand = prodStartGen ($countProd, $lim);
+    }
+    return $prodRand;
  }
 ///////////////////////////////////////////////////////////////////////////////////////
 /*Начало логики*/
@@ -140,6 +164,74 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
             header('Location: /admin/'); die();
         }
     }
+
+    /*Если нажато генерация похожих товаров*/
+    if (!empty($_GET['generetionUniq'])) {
+        $genCatID = $_GET['generetionUniq'];
+        $countProd = $_GET['countProd'];
+
+        $query = "SELECT id FROM product WHERE category_id='$genCatID'";
+        $result = mysqli_query($link, $query) or die(mysqli_error($link));
+        for ($dataProd = []; $row = mysqli_fetch_assoc($result); $dataProd[] = $row);
+
+        foreach ($dataProd as $idValue) {
+      
+            //генерация от какого товара начинать LIMIT
+            $prodRand = prodStartGen ($countProd, 7);
+            $query = "SELECT id FROM product WHERE category_id='$genCatID' LIMIT $prodRand,7";
+            $result = mysqli_query($link, $query) or die(mysqli_error($link));
+            for ($dataGen = []; $row = mysqli_fetch_assoc($result); $dataGen[] = $row);
+
+            //вставка данных в таблицы продукты, в колонку similar_products
+            $dataGenStr = '';
+            foreach ($dataGen as $val) {
+                $dataGenStr .= $val['id'].';';
+            }
+            $idValue = $idValue['id'];
+            $query = "UPDATE product SET similar_products='$dataGenStr' WHERE id='$idValue'";
+            $result = mysqli_query($link, $query) or die(mysqli_error($link));
+        }
+        
+        $_SESSION['info'] = [
+            'msg' => "Успешно добавленно",
+            'status' => 'success'
+        ];
+        header('Location: /admin/'); die();
+    }
+
+        /*Если нажато генерация других ИМ*/
+        if (!empty($_GET['generetionOtherIMUniq'])) {
+            $genCatID = $_GET['generetionOtherIMUniq']; //какую категорию исключить
+            $countCategory = $_GET['countCategory']; //сколько категорий
+    
+            $query = "SELECT id FROM product WHERE category_id='$genCatID'";
+            $result = mysqli_query($link, $query) or die(mysqli_error($link));
+            for ($dataProd = []; $row = mysqli_fetch_assoc($result); $dataProd[] = $row);
+    
+            foreach ($dataProd as $idValue) { //в каждый товар -
+          
+                //генерация от какого товара начинать LIMIT
+                $prodRand = prodStartGen ($countCategory, 12);
+                $query = "SELECT id FROM category WHERE id!='$genCatID' LIMIT $prodRand,12"; //выбрать категории из данного запроса к таблице категорий-
+                $result = mysqli_query($link, $query) or die(mysqli_error($link));
+                for ($dataGenCat = []; $row = mysqli_fetch_assoc($result); $dataGenCat[] = $row);
+    
+                //вставка данных в таблицы продукты, в колонку other_online_stores
+                $dataGenCatStr = '';
+                foreach ($dataGenCat as $val) {
+                    $dataGenCatStr .= $val['id'].';';
+                }
+                $idValue = $idValue['id'];
+                $query = "UPDATE product SET other_online_stores='$dataGenCatStr' WHERE id='$idValue'";
+                $result = mysqli_query($link, $query) or die(mysqli_error($link));
+            }
+            
+            $_SESSION['info'] = [
+                'msg' => "Успешно добавленно",
+                'status' => 'success'
+            ];
+            header('Location: /admin/'); die();
+        }
 
 
 
@@ -204,3 +296,6 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
     header('Location: /admin/login.php'); die();
 }
 
+/*echo "<pre>";
+print_r($idValue);
+echo "</pre>";*/

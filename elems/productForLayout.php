@@ -14,6 +14,8 @@ $dateProd = date('Y-m-d', $page['modified_time']);
 $pid = $page['groupid'];
 $param = $page['param'];
 $description = $page['description'];
+$similar_products = $page['similar_products'];
+$other_online_stores = $page['other_online_stores'];
 
 
 $catID = $cat['id'];
@@ -133,8 +135,8 @@ if ('[KEYPART-26]' != FALSE) {
                 $content .= '<span>ПОДРОБНЕЕ</span>';
             $content .= '</a>';
         $content .= '</p>';
-        $content .= '<script src="/yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>';
-        $content .= '<script src="/yastatic.net/share2/share.js"></script>';
+        $content .= '<script src="http://yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>';
+        $content .= '<script src="http://yastatic.net/share2/share.js"></script>';
         $content .= '<div class="ya-share2" data-services="collections,vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,telegram" data-counter=""></div>';
     $content .= '</div>';
     $content .= '<div class="clrb"></div>';
@@ -218,35 +220,57 @@ if ('[KEYPART-26]' != FALSE) {
     $content .= '<script>$(".description").readmore({maxHeight: 240, moreLink: "<a href=\"#\" class=\"moredescription\">+ Смотреть</a>", lessLink: "<a href=\"#\" class=\"moredescription\">- Скрыть</a>"});</script>';
     $content .= '<hr color="white">';
 $content .= '</div>';
-/*<p>Похожие товары</p>
-{REPEAT-7-7}
-{PUNIQCATRANDKEYWORD}
-<div class="tovar smtovar mtop10">
-    <?php 
-    $Part8 = '[PART-8]';
-    $Part10temp = explode('&-&-&', '[PART-10]');
-    $Part10 = $Part10temp[0];
-    ?>
-    <?php if (isset($Part8) AND $Part8 == TRUE) { ?><div class="discount"><?php } ?>
-    <?php if (isset($Part8) AND $Part8 == TRUE) { echo '-'; echo round((100*($Part8 - [PART-11]))/$Part8, 0); ?>%</div><?php } ?>
-    <div class="image camera">
-        <a href="[URL]">
-            <img src="<?php echo $Part10; ?>" onload="goodLoadImg(this);" onerror="errLoadImg(this);">
-        </a>
-    </div>
-    <div class="name">
-        <a href="[URL]">[PART-7]</a>
-    </div>
-    <div>
-        <span class="price"><?php echo number_format([PART-11], 0, "", " ")?>р.</span>
-        <?php if (isset($Part8) AND $Part8 == TRUE) { ?><span class="oldprice">[PART-8]р.</span><?php } ?>
-    </div>
-</div>
-{/PUNIQCATRANDKEYWORD}
-{/REPEAT}
-<div class="clrb"></div>
-<hr color="white">
-<p>Другие товары</p>
+
+if ($similar_products != '') {
+    $similar_products = explode(';', rtrim($similar_products, ';'));
+    $content .= '<p>Похожие товары</p>';
+
+    foreach ($similar_products as $idPartProduct) {
+        $query = "SELECT uri, name, price, oldprice, picture FROM product WHERE id='$idPartProduct'";
+        $result = mysqli_query($link, $query) or die( mysqli_error($link) );
+        $pagePartProduct = mysqli_fetch_assoc($result);
+
+        $pagePartProductURI = $pagePartProduct['uri'];
+        $pagePartProductName = $pagePartProduct['name'];
+        $pagePartProductPrice = $pagePartProduct['price'];
+        $pagePartProductOldprice = $pagePartProduct['oldprice'];
+        $pagePartProductPicture = $pagePartProduct['picture'];
+
+        $content .= '<div class="tovar smtovar mtop10">';
+            if (isset($pagePartProductOldprice) AND $pagePartProductOldprice == TRUE) {
+                $content .= '<div class="discount">';
+            }
+            if (isset($pagePartProductOldprice) AND $pagePartProductOldprice == TRUE) {
+                $content .= '-';
+                $content .= round((100*($pagePartProductOldprice -$pagePartProductPrice))/$pagePartProductOldprice, 0); 
+                $content .= '%</div>';
+            }
+            $content .= '<div class="image camera">';
+                $content .= "<a href=\"/$catURI/$pagePartProductURI\">";
+                    $Part10temp = explode('&-&-&', $pagePartProductPicture);
+                    $pagePartProductPicture = $Part10temp[0];
+                    $content .= "<img src=\"$pagePartProductPicture\" onload=\"goodLoadImg(this);\" onerror=\"errLoadImg(this);\">";
+                $content .= '</a>';
+            $content .= '</div>';
+            $content .= '<div class="name">';
+                $content .= "<a href=\"/$catURI/$pagePartProductURI\">$pagePartProductName</a>";
+            $content .= '</div>';
+            $content .= '<div>';
+                $content .= '<span class="price">';
+                    $content .= number_format($pagePartProductPrice, 0, "", " ");
+                $content .= ' р.</span>';
+                if (isset($pagePartProductOldprice) AND $pagePartProductOldprice == TRUE) {
+                    $content .= "<span class=\"oldprice\">$pagePartProductOldprice р.</span>";
+                }
+            $content .= '</div>';
+        $content .= '</div>';
+    }
+
+    $content .= '<div class="clrb"></div>';
+    $content .= '<hr color="white">';
+}
+
+/*$content .= '<p>Другие товары</p>';
 <div class="gtt">
     {REPEAT-4-4}
     {PUNIQCATRANDKEYWORD}
@@ -254,19 +278,36 @@ $content .= '</div>';
     {/PUNIQCATRANDKEYWORD}
     {/REPEAT}
 </div>
-<hr color="white">
-<p>Другие интернет-магазины:</p>
-<div class="mgs mtop10">
-    {REPEAT-12-12}
-    {PUNIQRANDCAT}
-    <a href='[URL]'>
-        <img src="/images/logo/<?php $str = trim('[URL]', '/'); echo trim($str, "c"); ?>.jpg" alt="[ANCHOR]" onload="goodLoadImg(this);" onerror="errLoadImg(this);">
-    </a>
-    {/PUNIQRANDCAT}
-    {/REPEAT}
-</div>
 <div class="clrb"></div>
 <hr color="white">*/
+
+if ($other_online_stores != '') {
+    $other_online_stores = explode(';', rtrim($other_online_stores, ';'));
+    $content .= '<p>Другие интернет-магазины:</p>';
+    $content .= '<div class="mgs mtop10">';
+
+    foreach ($other_online_stores as $idPartProduct) {
+        
+        $query = "SELECT * FROM category WHERE id='$idPartProduct'";
+        $result = mysqli_query($link, $query) or die( mysqli_error($link) );
+        $pagePartProduct = mysqli_fetch_assoc($result);
+
+        $pagePartProductID = $pagePartProduct['id'];
+        $pagePartProductURI = $pagePartProduct['uri'];
+        $pagePartProductName = $pagePartProduct['name'];
+
+        
+            $content .= "<a href=\"/$pagePartProductURI/\">";
+                $content .= "<img src=\"/images/logo/$pagePartProductID.jpg\" alt=\"$pagePartProductName\" style=\"width:143px\" onload=\"goodLoadImg(this);\" onerror=\"errLoadImg(this);\">";
+            $content .= '</a>';
+        
+    }
+
+    $content .= '</div>';
+    $content .= '<div class="clrb"></div>';
+    $content .= '<hr color="white">';
+
+}
 
 /*echo "<pre>";
 print_r($page);
