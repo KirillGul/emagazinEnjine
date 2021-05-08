@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <?php if(!empty($metaCartRefrash)) echo $metaCartRefrash; //для корзины?>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="/assets/favicon.ico">
@@ -12,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
     <link rel="stylesheet" href="/assets/style.css">
     <?= $title ?>
-    <?= $description ?>
+    <?php if(!empty($description)) echo $description; ?>
 </head>
 <body>
     <div id="wrapper">

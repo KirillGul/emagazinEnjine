@@ -68,9 +68,8 @@ switch ($flag) {
         include 'elems/layout.php';
         break;
     case 'cpa':
-        echo "OK";
-        //include 'elems/productForLayout.php';
-        //include 'elems/layout.php';
+        include 'elems/cartForLayout.php';
+        include 'elems/layout.php';
         break;
     default:
         $page = queryPageOnURI($link, '404', 'page');

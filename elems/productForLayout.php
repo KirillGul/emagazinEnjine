@@ -309,6 +309,12 @@ if ($other_online_stores != '') {
 
 }
 
+setcookie("cat", $catName, 0, "/cart/$catID/$prodURI");
+setcookie("productName", "$prodName $vendorCode", 0, "/cart/$catID/$prodURI");
+$prodURL = $page['produrl'];
+setcookie("link", $prodURL, 0, "/cart/$catID/$prodURI");
+setcookie("productImage", $picture, 0, "/cart/$catID/$prodURI");
+
 /*echo "<pre>";
 print_r($page);
 echo "</pre>";*/
