@@ -23,7 +23,7 @@ foreach ($data as $columns) { //вывод категорий через $conten
 
     $content .= '<div class="mg">';
     $content .= "<a href=\"/$uri/\">";
-    $content .= "<img src=\"/images/logo/$id.jpg\" alt=\"$name\" onload=\"goodLoadImg(this);\" onerror=\"errLoadImg(this);\">";
+    $content .= "<img src=\"/images/logo/$uri.jpg\" alt=\"$name\" onload=\"goodLoadImg(this);\" onerror=\"errLoadImg(this);\">";
     $content .= '</a></div>'; 
 }
 $content .= '</div>';

@@ -93,7 +93,7 @@ function getTranslit ($str) {
        'ь'=>'', 'э'=>'e', 'ю'=>'iu', 'я'=>'ia'];
  
     foreach (preg_split('/(?<!^)(?!$)/u', $str) as $value) {
-        if (!empty($arr[$value])) {
+        if (isset($arr[$value])) {
             $arrTranslit[] = $arr[$value];
         } else {
             $arrTranslit[] = $value;
@@ -244,13 +244,14 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
 
         foreach ($arrCat as $value) {
             $nameCat =  (str_replace('.xml', '', $value)); //убрать .xml
+            $nameCat =  (str_replace("'", '', $nameCat)); //убрать '
             $nameCat =  trim($nameCat);
 
             $uriCat = mb_strtolower(str_replace(' ', '-', $nameCat)); //перевод в нижн. регистр и замена пробелов на тире 
             $uriCat = implode('', getTranslit($uriCat));
 
             if (checkURI($link, $uriCat , 'category') == false) {
-                $query = "INSERT INTO category SET name=' $nameCat', uri='$uriCat'";
+                $query = "INSERT INTO category SET name='$nameCat', uri='$uriCat'";
                 $result = mysqli_query($link, $query) or die(mysqli_error($link));
             }
         }
