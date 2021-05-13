@@ -156,6 +156,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                            $prodDescription = $reader->value;
                            $prodDescription = trim($prodDescription); //убираем переносы строк по краям
                            $prodDescription = str_replace(array("\r\n", "\r", "\n"), ' ', $prodDescription); //убираем переносы строк ввнутри
+                           $prodDescription = str_replace(array("'"), "\'", $prodDescription);
                            continue 2;
                         case "modified_time":
                            $reader->read();
@@ -164,6 +165,8 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                         case "name":
                            $reader->read();
                            $prodName = $reader->value;
+                           $prodName = str_replace(array("\r\n", "\r", "\n"), ' ', $prodName); //убираем переносы строк ввнутри
+                           $prodName = str_replace(array("'"), "\'", $prodName);
                            continue 2;
                         case "oldprice":
                            $reader->read();
@@ -185,6 +188,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                         case "vendor":
                            $reader->read();
                            $prodVendor = $reader->value;
+                           $prodVendor = str_replace(array("'"), "\'", $prodVendor); //убираем переносы строк ввнутри
                            continue 2;
                         case "vendorCode":
                            $reader->read();
@@ -220,6 +224,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                }
                
                $prodSubCategoryName = $cat["$prodSubCategoryId"].""; //добавляем имя категории
+               $prodSubCategoryName = str_replace(array("'"), "\'", $prodSubCategoryName);
 
                $prod = [
                   'available'=>$prodAvailable,
@@ -261,18 +266,26 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                $available = $value1['available'].'';
                $subcategoryid = $value1['subcategoryid'].'';
                $subcategoryname = $value1['subcategoryname'].'';
+               mysqli_real_escape_string($link, $subcategoryname);
                $description = $value1['description'].'';
-               $description = str_replace("'", "\'", $description);
+               mysqli_real_escape_string($link, $description);
+               //$description = str_replace('"', '\"', $name);
                $modifiedtime = $value1['modifiedtime'].'';
                $name = $value1['name'].'';
-               $name = str_replace("'", "\'", $name);
+               mysqli_real_escape_string($link, $name);
+              // $name = str_replace('"', '\"', $name);
+               /*echo "<pre>";
+               var_dump($description);
+               echo "</pre>";*/
                $oldprice = $value1['oldprice'].'';
                $price = $value1['price'].'';
                $param = $value1['param'].'';
+               mysqli_real_escape_string($link, $param);
                $picture = $value1['picture'].'';
                $type = $value1['type'].'';
                $produrl = $value1['produrl'].'';
                $vendor = $value1['vendor'].'';
+               mysqli_real_escape_string($link, $vendor);
                $vendorcode = $value1['vendorcode'].'';
                $groupid = $value1['groupid'].'';
                $topseller = $value1['topseller'].'';
@@ -297,8 +310,18 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                groupid='$groupid',
                topseller='$topseller'
                ";
+
+               /*echo "<pre>";
+               var_dump($query);
+               echo "</pre>";*/
                //echo "<br>";
-               $result = mysqli_query($link, $query) or die(mysqli_error($link));
+               //$result = mysqli_query($link, $query) or die(mysqli_error($link));
+               $result = mysqli_query($link, $query);
+               if (!$result) {
+                  echo "<pre>";
+               var_dump($query);
+               echo "</pre>";
+                }
             }		
          }
 
