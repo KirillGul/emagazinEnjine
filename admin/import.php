@@ -117,6 +117,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
          $prodArr = [];
          $prodUrlArr = []; //массив для проверки дублей товаров
          $categoryId = $_GET['id'];
+         $categoryUri = $_GET['uriCat'];
 
          //Начало парсинга товаров
          //$reader->open($xml);
@@ -203,9 +204,13 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                               $prodParam = '';
                            } else {
                               $atrib = $reader->getAttribute('name');
+                              
                               if ($atrib == 'origin_url') continue 2; //пропуск определенной параметра
                               $reader->read();
-                              $prodParam .= $atrib.':'.$reader->value."&-&-&";
+                              $prodParamTemp = $reader->value;
+                              $prodParamTemp = str_replace(array("'"), "\'", $prodParamTemp); //убираем переносы строк ввнутри
+                              
+                              $prodParam .= $atrib.':'.$prodParamTemp."&-&-&";
                            }
                            continue 2;
                         case "picture":
@@ -291,7 +296,7 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                $topseller = $value1['topseller'].'';
 
                $query = "INSERT INTO product SET 
-               uri='$countProdUniq', 
+               uri='$categoryUri/$countProdUniq', 
                available='$available', 
                category_id='$categoryId',
                category_sub_id='$subcategoryid',
@@ -319,9 +324,9 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
                $result = mysqli_query($link, $query);
                if (!$result) {
                   echo "<pre>";
-               var_dump($query);
-               echo "</pre>";
-                }
+                  var_dump($query);
+                  echo "</pre>";
+               }
             }		
          }
 

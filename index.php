@@ -32,7 +32,7 @@ if ($uri == '/') { //если главная
     if (count($uriArr) == 1 AND checkURI($link, $uriArr[0])) { //если первый уровень
         $flag = 'category';
     } elseif (count($uriArr) == 2) { //если второй уровень
-        if (checkURI($link, $uriArr[0]) AND checkURI($link, $uriArr[1], 'product')) {
+        if (checkURI($link, $uriArr[0]) AND checkURI($link, "{$uriArr[0]}/{$uriArr[1]}", 'product')) {
             $flag = 'product';
         } else {
             $flag = '404';
@@ -40,7 +40,7 @@ if ($uri == '/') { //если главная
     } elseif (count($uriArr) == 4 AND $uriArr[0] === 'cart' AND 
                 ($uriArr[3] === 'photoinproduct' || $uriArr[3] === 'morephoto' || 
                 $uriArr[3] === 'buybutton' || $uriArr[3] === 'readmore' || $uriArr[3] === 'othercolors' || $uriArr[3] === 'othersizes')) {
-            if (checkURI($link, $uriArr[1], 'category', 'id') AND checkURI($link, $uriArr[2], 'product')) {
+            if (checkURI($link, $uriArr[1], 'category', 'name') AND checkURI($link, "{$uriArr[1]}/{$uriArr[2]}", 'product')) {
                 $flag = 'cpa';
             } else {
                 $flag = '404';
@@ -62,7 +62,7 @@ switch ($flag) {
         include 'elems/layout.php';
         break;
     case 'product':
-        $page = queryPageOnURI($link, $uriArr[1], 'product');
+        $page = queryPageOnURI($link, "{$uriArr[0]}/{$uriArr[1]}", 'product');
         $cat = queryPageOnURI($link, $uriArr[0], 'category');
         include 'elems/productForLayout.php';
         include 'elems/layout.php';

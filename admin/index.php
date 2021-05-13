@@ -24,6 +24,8 @@ function showPageTable ($link) {
         </tr>";
     foreach ($data as $value) {
         $idCat = $value['id'];
+        $uriCat = $value['uri'];
+        //$countProduct = "Отключено";
 
         $query = "SELECT COUNT(*) as count FROM product WHERE category_id='$idCat'";
         $result = mysqli_query($link, $query) or die( mysqli_error($link) );
@@ -40,11 +42,17 @@ function showPageTable ($link) {
             <td>{$value['name']}</td>
             <td>{$value['uri']}</td>
             <td>$countProduct</td>
-            <td><a href=\"import.php?id=$idCat\">Import</a></td>";
+            <td><a href=\"import.php?id=$idCat&uriCat=$uriCat\">Import</a></td>";
 
-        if ($countProduct > 7)
+        if ($countProduct > 7 OR $countProduct !== "Отключено") {
             $table .= "<td><a href=\"?generetionUniq=$idCat&countProd=$countProduct\">Похожие товары<br>(той же категории)</a></td>";
-        else $table .= "<td>В категории мало товаров для генерации</td>";
+        } else {
+            if ($countProduct === "Отключено") {
+                $table .= "<td><a href=\"?generetionUniq=$idCat&countProd=$countProduct\">Похожие товары<br>(той же категории)</a></td>";
+            } else {
+                $table .= "<td>В категории мало товаров для генерации</td>";
+            }        
+        }
 
         $table .= "<td><a href=\"?generetionOtherIMUniq=$idCat&countCategory=$countCategory\">Другие интернет-мгазины</a></td>";
         $table .= "<td><a href=\"?delProductID=$idCat\">Очистить от товаров</a></td>
@@ -173,6 +181,13 @@ if (isset($_SESSION['auth']) AND $_SESSION['auth'] == TRUE) {
         $query = "SELECT id FROM product WHERE category_id='$genCatID'";
         $result = mysqli_query($link, $query) or die(mysqli_error($link));
         for ($dataProd = []; $row = mysqli_fetch_assoc($result); $dataProd[] = $row);
+
+        if ($countProd === 'Отключено') {
+            $query = "SELECT COUNT(*) as count FROM product WHERE category_id='$genCatID'";
+            $result = mysqli_query($link, $query) or die( mysqli_error($link) );
+            //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
+            $countProd = mysqli_fetch_assoc($result)['count'];
+        }
 
         foreach ($dataProd as $idValue) {
       

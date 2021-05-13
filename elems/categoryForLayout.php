@@ -72,13 +72,13 @@ foreach ($data as $tovar) {
 
     //картинка
     $content .= '<div class="image">';
-    $content .= "<a href=\"{$tovar['uri']}\">";
+    $content .= "<a href=\"$prefhostHTTP$hostHTTP/{$tovar['uri']}\">";
     $content .= "<img src=\"{$tovar['picture']}\" onload=\"goodLoadImg(this);\" onerror=\"errLoadImg(this);\">";
     $content .= '</a></div>';
 
     //название товара
     $content .= '<div class="name">';
-    $content .= "<a href=\"{$tovar['uri']}\">{$tovar['name']}</a>";
+    $content .= "<a href=\"$prefhostHTTP$hostHTTP/{$tovar['uri']}\">{$tovar['name']}</a>";
     $content .= '</div>';
 
     //вывод цены и старой цены

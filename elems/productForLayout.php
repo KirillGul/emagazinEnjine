@@ -16,6 +16,7 @@ $param = $page['param'];
 $description = $page['description'];
 $similar_products = $page['similar_products'];
 $other_online_stores = $page['other_online_stores'];
+$pID = $page['id'];
 
 
 $catID = $cat['id'];
@@ -24,7 +25,9 @@ $catURI = $cat['uri'];
 
 $request_uri = $_SERVER['REQUEST_URI'];
 
-$title = "<title>$prodName $vendorCode, цена $price р., фото и отзывы</title>";
+//$title = "<title>$prodName $vendorCode, цена $price р., фото и отзывы</title>";
+$title = "<title>ᐉ Купить【$prodName $vendorCode по цене от $price РУБ】со скидкой по самой низкой цене | Сравнение цен и акции на $prodName $pID</title>";
+
 $description = "
     <meta name=\"description\" content=\"$prodName $vendorCode $oldpriceSuf за $price р. в интернет-магазине $catName. Купите недорого с доставкой. Смотрите фото, описание и характеристики.\">
     <link rel='canonical' href='$prefhostHTTP$hostHTTP$request_uri'>
@@ -79,11 +82,11 @@ if (isset($oldprice) AND $oldprice == TRUE) {
 }
 
     $content .= '<div class="bigimg camera">';
-        $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$catID/$prodURI/photoinproduct/', '_blank'); return false\" data-href='/cart/$catID/$prodURI/photoinproduct/' class=\"pointer outli\">";
+        $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$prodURI/photoinproduct/', '_blank'); return false\" data-href='/cart/$prodURI/photoinproduct/' class=\"pointer outli\">";
             $content .= "<img src=\"$picture\" alt=\"$prodName $vendorCode\" onload=\"goodLoadImg(this);\" onerror=\"errLoadImg(this);\">";
         $content .= '</a>';
         $content .= '<p class="readmore">';
-            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$catID/$prodURI/morephoto/', '_blank'); return false\" data-href='/cart/$catID/$prodURI/morephoto/' class=\"pointer outli\">";
+            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$prodURI/morephoto/', '_blank'); return false\" data-href='/cart/$prodURI/morephoto/' class=\"pointer outli\">";
                 $content .= '<span>ВСЕ ФОТО</span>';
             $content .= '</a>';
         $content .= '</p>';
@@ -101,7 +104,7 @@ if (isset($oldprice) AND $oldprice == TRUE) {
             $content .= ' р.';
         $content .= '</div>';
         $content .= '<div class="buybutton">';
-            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$catID/$prodURI/buybutton/', '_blank'); return false\" data-href='</cart/$catID/$prodURI/buybutton/' class=\"pointer outli\">";
+            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$prodURI/buybutton/', '_blank'); return false\" data-href='</cart/$prodURI/buybutton/' class=\"pointer outli\">";
                 $content .= '<span >КУПИТЬ</span>';
             $content .= '</a>';
         $content .= '</div>';
@@ -132,7 +135,7 @@ if ('[KEYPART-26]' != FALSE) {
             $content .= "<p>PID: $pid</p>";
         }
         $content .= '<p class="readmore">';
-            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$catID/$prodURI/readmore/', '_blank'); return false\" data-href='/cart/$catID/$prodURI/readmore/' class=\"pointer outli\">";
+            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$prodURI/readmore/', '_blank'); return false\" data-href='/cart/$prodURI/readmore/' class=\"pointer outli\">";
                 $content .= '<span>ПОДРОБНЕЕ</span>';
             $content .= '</a>';
         $content .= '</p>';
@@ -148,8 +151,10 @@ if ('[KEYPART-26]' != FALSE) {
         $content .= '<h2>Характеристики</h2>';
         $parameters = explode('&-&-&', trim($param, '&-&-&'));
         $count_parameters = count($parameters);
-        list($table1, $table2) = array_chunk($parameters, ceil($count_parameters/2));
-        if (count($table1) > 0) {
+        if ($count_parameters <= 1) list($table1) = array_chunk($parameters, ceil($count_parameters/2));
+        else list($table1, $table2) = array_chunk($parameters, ceil($count_parameters/2));
+
+        if (isset($table1) AND count($table1) > 0) {
         $content .= '<table class="params params2">';
             
             foreach ($table1 as $value) {
@@ -160,12 +165,12 @@ if ('[KEYPART-26]' != FALSE) {
                     $content .= $arr[1];
                     if ($arr[0] == 'Цвет') { 
                         $content .= '<span class="othprms">';
-                            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$catID/$prodURI/othercolors/', '_blank'); return false\" data-href='/cart/$catID/$prodURI/othercolors/' class=\"pointer outli\">+все цвета</a>";
+                            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$prodURI/othercolors/', '_blank'); return false\" data-href='/cart/$prodURI/othercolors/' class=\"pointer outli\">+все цвета</a>";
                         $content .= '</span>';
                     }
                     if ($arr[0] == 'Размер') { 
                         $content .= '<span class="othprms">';
-                            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$catID/$prodURI/othercolors/', '_blank'); return false\" data-href='/cart/$catID/$prodURI/othercolors/' class=\"pointer outli\">+все размеры</a>";
+                            $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$prodURI/othercolors/', '_blank'); return false\" data-href='/cart/$prodURI/othercolors/' class=\"pointer outli\">+все размеры</a>";
                         $content .= '</span>';
                     }
                 $content .= '</td>';
@@ -174,7 +179,7 @@ if ('[KEYPART-26]' != FALSE) {
         }
         
         
-        if (count($table2) > 0) {
+        if (isset($table2) AND count($table2) > 0) {
             $content .= '<table class="params params2">';
 
             foreach ($table2 as $value) {
@@ -185,12 +190,12 @@ if ('[KEYPART-26]' != FALSE) {
                         $content .= $arr1[1];
                         if ($arr1[0] == 'Цвет') {
                             $content .= '<span class="othprms">';
-                                $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$catID/$prodURI/othercolors/', '_blank'); return false\" data-href='/cart/$catID/$prodURI/othercolors/' class=\"pointer outli\">+все цвета</a>";
+                                $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$prodURI/othercolors/', '_blank'); return false\" data-href='/cart/$prodURI/othercolors/' class=\"pointer outli\">+все цвета</a>";
                             $content .= '</span>';
                         }
                         if ($arr1[0] == 'Размер') {
                             $content .= '<span class="othprms">';
-                                $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$catID/$prodURI/othercolors/', '_blank'); return false\" data-href='/cart/$catID/$prodURI/othercolors/' class=\"pointer outli\">+все размеры</a>";
+                                $content .= "<a rel=\"nofollow\" onclick=\"window.open('/cart/$prodURI/othercolors/', '_blank'); return false\" data-href='/cart/$prodURI/othercolors/' class=\"pointer outli\">+все размеры</a>";
                             $content .= '</span>';
                         }
                     $content .= '</td>';
@@ -247,14 +252,14 @@ if ($similar_products != '') {
                 $content .= '%</div>';
             }
             $content .= '<div class="image camera">';
-                $content .= "<a href=\"/$catURI/$pagePartProductURI\">";
+                $content .= "<a href=\"/$pagePartProductURI\">";
                     $Part10temp = explode('&-&-&', $pagePartProductPicture);
                     $pagePartProductPicture = $Part10temp[0];
                     $content .= "<img src=\"$pagePartProductPicture\" onload=\"goodLoadImg(this);\" onerror=\"errLoadImg(this);\">";
                 $content .= '</a>';
             $content .= '</div>';
             $content .= '<div class="name">';
-                $content .= "<a href=\"/$catURI/$pagePartProductURI\">$pagePartProductName</a>";
+                $content .= "<a href=\"/$pagePartProductURI\">$pagePartProductName</a>";
             $content .= '</div>';
             $content .= '<div>';
                 $content .= '<span class="price">';
@@ -309,11 +314,11 @@ if ($other_online_stores != '') {
 
 }
 
-setcookie("cat", $catName, 0, "/cart/$catID/$prodURI");
-setcookie("productName", "$prodName $vendorCode", 0, "/cart/$catID/$prodURI");
+setcookie("cat", $catName, 0, "/cart/$prodURI");
+setcookie("productName", "$prodName $vendorCode", 0, "/cart/$prodURI");
 $prodURL = $page['produrl'];
-setcookie("link", $prodURL, 0, "/cart/$catID/$prodURI");
-setcookie("productImage", $picture, 0, "/cart/$catID/$prodURI");
+setcookie("link", $prodURL, 0, "/cart/$prodURI");
+setcookie("productImage", $picture, 0, "/cart/$prodURI");
 
 /*echo "<pre>";
 print_r($page);
