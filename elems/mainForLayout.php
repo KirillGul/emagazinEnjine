@@ -19,11 +19,11 @@ $content = '<div class="mgs">';
 foreach ($data as $columns) { //вывод категорий через $content
     $id = $columns['id'];
     $uri = $columns['uri'];
-    $name = $columns['name'];
+    $name = ltrim($columns['name']);
 
     $content .= '<div class="mg">';
     $content .= "<a href=\"/$uri/\">";
-    $content .= "<img src=\"/images/logo/$id.jpg\" alt=\"$name\" onload=\"goodLoadImg(this);\" onerror=\"errLoadImg(this);\">";
+    $content .= "<img src=\"/images/logo/$name.jpg\" alt=\"$name\" onload=\"goodLoadImg(this);\" onerror=\"errLoadImg(this);\">";
     $content .= '</a></div>'; 
 }
 $content .= '</div>';
